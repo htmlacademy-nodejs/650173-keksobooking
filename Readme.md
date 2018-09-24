@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Pavel Rodionov](https://up.htmlacademy.ru/nodejs/2/user/650173).
-* Наставник: `Неизвестно`.
+* Наставник: [Дмитрий Донецкий](https://htmlacademy.ru/profile/id497669).
 
 ---
 
