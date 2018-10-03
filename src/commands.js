@@ -1,6 +1,7 @@
 'use strict';
 
 const versionCommand = require(`./commands/version`);
+const authorCommand = require(`./commands/author`);
 const helpCommand = require(`./commands/help`);
 const defaultCommand = require(`./commands/default`);
 const errorCommand = require(`./commands/error`);
@@ -14,12 +15,14 @@ class Command {
   constructor(userCommand) {
     this.userCommand = userCommand;
     this.commands = [
+      helpCommand,
       versionCommand,
-      helpCommand
+      authorCommand
     ];
     this.availableCommands = [
+      defaultCommand,
       versionCommand,
-      defaultCommand
+      authorCommand
     ];
   }
 
