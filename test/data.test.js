@@ -1,8 +1,8 @@
 'use strict';
 
 const assert = require(`assert`);
-const Data = require(`../src/data`).data;
-const preparedData = require(`../src/data`).preparedData;
+const Data = require(`../src/data`).Data;
+const PreparedData = require(`../src/data`).PreparedData;
 
 let generatedData;
 
@@ -18,30 +18,30 @@ describe(`Data.generate()`, () => {
   });
 
   it(`should generate correct rooms`, () => {
-    const rooms = preparedData.ROOMS;
+    const rooms = PreparedData.ROOMS;
     assert(generatedData.offer.rooms >= rooms.MIN && generatedData.offer.rooms <= rooms.MAX);
   });
 
   it(`should generate correct price`, () => {
-    const price = preparedData.PRICE;
+    const price = PreparedData.PRICE;
     assert(generatedData.offer.price >= price.MIN && generatedData.offer.rooms <= price.MAX);
   });
 
   it(`should generate correct checkin and checkout`, () => {
-    assert(preparedData.TIMES.includes(generatedData.offer.checkin));
-    assert(preparedData.TIMES.includes(generatedData.offer.checkout));
+    assert(PreparedData.TIMES.includes(generatedData.offer.checkin));
+    assert(PreparedData.TIMES.includes(generatedData.offer.checkout));
   });
 
   it(`should generate correct title`, () => {
-    assert(preparedData.TITLE.includes(generatedData.offer.title));
+    assert(PreparedData.TITLE.includes(generatedData.offer.title));
   });
 
   it(`should generate correct type`, () => {
-    assert(preparedData.TYPE.includes(generatedData.offer.type));
+    assert(PreparedData.TYPE.includes(generatedData.offer.type));
   });
 
   it(`should generate correct features`, () => {
-    assert.strictEqual(generatedData.offer.features.filter((x) => !preparedData.FEATURES.includes(x)).length, 0);
+    assert.strictEqual(generatedData.offer.features.filter((x) => !PreparedData.FEATURES.includes(x)).length, 0);
   });
 
   it(`should generate correct description`, () => {
@@ -53,7 +53,7 @@ describe(`Data.generate()`, () => {
   });
 
   it(`should generate correct photos`, () => {
-    assert.deepEqual(generatedData.offer.photos.sort(), preparedData.PHOTOS);
+    assert.deepEqual(generatedData.offer.photos.sort(), PreparedData.PHOTOS);
   });
 
   describe(`author`, () => {
@@ -64,7 +64,7 @@ describe(`Data.generate()`, () => {
 
   describe(`location`, () => {
     it(`should generate correct location`, () => {
-      const location = preparedData.LOCATION;
+      const location = PreparedData.LOCATION;
 
       assert(generatedData.location.x >= location.X.MIN && generatedData.location.x <= location.X.MAX);
       assert(generatedData.location.y >= location.Y.MIN && generatedData.location.y <= location.Y.MAX);
@@ -74,7 +74,7 @@ describe(`Data.generate()`, () => {
   describe(`date`, () => {
     it(`should generate correct date`, () => {
       const currentDate = Data.date(0);
-      const pastDate = Data.date(preparedData.DAYS_OFFSET);
+      const pastDate = Data.date(PreparedData.DAYS_OFFSET);
 
       assert(generatedData.date <= currentDate && generatedData.date >= pastDate);
     });

@@ -1,6 +1,6 @@
 'use strict';
 
-const preparedData = {
+const PreparedData = {
   TITLE: [
     `Большая уютная квартира`, `Маленькая неуютная квартира`, `Огромный прекрасный дворец`,
     `Маленький ужасный дворец`, `Красивый гостевой домик`, `Некрасивый негостеприимный домик`,
@@ -19,14 +19,16 @@ const preparedData = {
     X: {MIN: 300, MAX: 900},
     Y: {MIN: 150, MAX: 500}
   },
+  GUESTS: {MIN: 1, MAX: 10},
   ROOMS: {MIN: 1, MAX: 5},
   PRICE: {MIN: 1000, MAX: 1000000}
 };
+const DAYS_IN_MS = 24 * 60 * 60 * 1000;
 
-const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
-const randomElementFromArray = (array) => array[Math.floor(Math.random() * array.length)];
+const randomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+const randomElementFromArray = (array) => array[randomNumber(0, array.length - 1)];
 const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
-const dateOffset = (offset) => (24 * 60 * 60 * 1000) * offset;
+const dateOffset = (offset) => DAYS_IN_MS * offset;
 
 class Data {
   static generate() {
@@ -50,16 +52,16 @@ class Data {
         photos: Data.photos()
       },
       location,
-      date: Data.date(random(0, preparedData.DAYS_OFFSET))
+      date: Data.date(randomNumber(0, PreparedData.DAYS_OFFSET))
     };
   }
 
   static avatar() {
-    return `https://robohash.org/${random(1, 1000)}-${random(1, 1000)}`;
+    return `https://robohash.org/${randomNumber(1, 1000)}-${randomNumber(1, 1000)}`;
   }
 
   static title() {
-    return randomElementFromArray(preparedData.TITLE);
+    return randomElementFromArray(PreparedData.TITLE);
   }
 
   static address(location) {
@@ -67,31 +69,31 @@ class Data {
   }
 
   static price() {
-    return random(preparedData.PRICE.MIN, preparedData.PRICE.MAX);
+    return randomNumber(PreparedData.PRICE.MIN, PreparedData.PRICE.MAX);
   }
 
   static type() {
-    return randomElementFromArray(preparedData.TYPE);
+    return randomElementFromArray(PreparedData.TYPE);
   }
 
   static rooms() {
-    return random(preparedData.ROOMS.MIN, preparedData.ROOMS.MAX);
+    return randomNumber(PreparedData.ROOMS.MIN, PreparedData.ROOMS.MAX);
   }
 
   static guests() {
-    return random(1, 10);
+    return randomNumber(PreparedData.GUESTS.MIN, PreparedData.GUESTS.MAX);
   }
 
   static checkin() {
-    return randomElementFromArray(preparedData.TIMES);
+    return randomElementFromArray(PreparedData.TIMES);
   }
 
   static checkout() {
-    return randomElementFromArray(preparedData.TIMES);
+    return randomElementFromArray(PreparedData.TIMES);
   }
 
   static features() {
-    return shuffleArray(preparedData.FEATURES).slice(0, random(1, preparedData.FEATURES.length));
+    return shuffleArray(PreparedData.FEATURES).slice(0, randomNumber(1, PreparedData.FEATURES.length));
   }
 
   static description() {
@@ -99,13 +101,13 @@ class Data {
   }
 
   static photos() {
-    return shuffleArray(preparedData.PHOTOS);
+    return shuffleArray(PreparedData.PHOTOS);
   }
 
   static location() {
     return {
-      x: random(preparedData.LOCATION.X.MIN, preparedData.LOCATION.X.MAX),
-      y: random(preparedData.LOCATION.Y.MIN, preparedData.LOCATION.Y.MAX)
+      x: randomNumber(PreparedData.LOCATION.X.MIN, PreparedData.LOCATION.X.MAX),
+      y: randomNumber(PreparedData.LOCATION.Y.MIN, PreparedData.LOCATION.Y.MAX)
     };
   }
 
@@ -115,6 +117,6 @@ class Data {
 }
 
 module.exports = {
-  data: Data,
-  preparedData
+  Data,
+  PreparedData
 };
