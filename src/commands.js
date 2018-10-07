@@ -36,31 +36,28 @@ class Command {
 
   handle() {
     this.checkHelpCommand();
-    this.checkAvailableCommands();
-    this.showErrorAndExit();
+    this.checkAvailableCommands()
+      .then(() => Command.exitWithoutError());
+    // this.showErrorAndExit();
   }
 
   checkAvailableCommands() {
-    this.availableCommands.forEach((command) => {
-      if (this.userCommand === command.name) {
-        command.execute();
-        if (command.needToExit){
-          Command.exitWithoutError();
-        }
-      }
-    });
+    const commands = this.availableCommands.filter((command) => this.userCommand === command.name);
+    return Promise.all(commands.map((command) => command.execute()));
   }
 
   checkHelpCommand() {
     if (this.userCommand === helpCommand.name) {
-      helpCommand.execute(this.commands);
-      Command.exitWithoutError();
+      helpCommand
+        .execute(this.commands)
+        .then(() => Command.exitWithoutError());
     }
   }
 
   showErrorAndExit() {
-    errorCommand.execute(this.userCommand);
-    Command.exitWithError();
+    errorCommand
+      .execute(this.userCommand)
+      .then(() => Command.exitWithError());
   }
 }
 

@@ -1,27 +1,27 @@
 'use strict';
 
-const readline = require(`readline`);
 const fs = require(`fs`);
 const Data = require(`../src/data`).Data;
 
+const readline = require(`readline`);
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
-const Defauls = {
-  FILENAME: `offers`,
-  FILE_WRITE_OPTIONS: {encoding: `utf-8`, mode: 0o644}
+const DefaulsFileParams = {
+  NAME: `offers`,
+  WRITE_OPTIONS: {encoding: `utf-8`, mode: 0o644}
 };
 const Questions = {
   OFFERS_COUNT: `Let's generate a new data. How many offers do you want to generate? `,
-  FILENAME: `Enter the filename(default: ${Defauls.FILENAME}): `,
+  FILENAME: `Enter the filename(default: ${DefaulsFileParams.NAME}): `,
   REWRITE_FILE: `File already exists. Do you want to rewrite it? (yes/no) `
 };
 const POSITIVE_ANSWERS = [`yes`, `y`];
 
 class GenerateData {
-  constructor(filePath = GenerateData.createFilePath(Defauls.FILENAME)) {
+  constructor(filePath) {
     this.dataCount = 1;
     this.filePath = filePath;
   }
@@ -46,7 +46,7 @@ class GenerateData {
 
   fileNameStep() {
     rl.question(Questions.FILENAME, (fileName) => {
-      fileName = fileName.trim() === `` ? Defauls.FILENAME : fileName;
+      fileName = fileName.trim() === `` ? DefaulsFileParams.NAME : fileName;
       this.filePath = GenerateData.createFilePath(fileName);
 
       fs.access(this.filePath, fs.constants.F_OK, (err) => {
@@ -81,6 +81,7 @@ class GenerateData {
         this.saveDataToFileStep();
         rl.close();
       } else {
+        console.log(`Okay :(`);
         process.exit(1);
       }
     });
@@ -92,7 +93,7 @@ class GenerateData {
     const data = JSON.stringify(fileData);
 
     return new Promise((success, fail) => {
-      fs.writeFile(this.filePath, data, Defauls.FILE_WRITE_OPTIONS, (err) => {
+      fs.writeFile(this.filePath, data, DefaulsFileParams.WRITE_OPTIONS, (err) => {
         if (err) {
           return fail(err);
         }
@@ -104,4 +105,3 @@ class GenerateData {
 }
 
 module.exports = GenerateData;
-// new GenerateData().start();

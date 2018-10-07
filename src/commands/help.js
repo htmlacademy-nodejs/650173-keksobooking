@@ -11,14 +11,17 @@ const prettyCommandName = (command) => {
 module.exports = {
   name: `--help`,
   description: `Shows all commands with description`,
-  needToExit: true,
   execute(commands) {
-    console.log(`Available commands:`);
-    commands.forEach((command) => {
-      const commandName = prettyCommandName(command.name);
-      const commandDescription = colors.green(command.description);
+    return new Promise((resolve) => {
+      console.log(`Available commands:`);
+      commands.forEach((command) => {
+        const commandName = prettyCommandName(command.name);
+        const commandDescription = colors.green(command.description);
 
-      console.log(`${ commandName } - ${ commandDescription }`);
+        console.log(`${ commandName } - ${ commandDescription }`);
+      });
+
+      resolve();
     });
   }
 };
