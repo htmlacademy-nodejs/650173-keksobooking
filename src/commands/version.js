@@ -11,7 +11,7 @@ module.exports = {
       const [major, minor, patch] = packageInfo.version.split(`.`);
 
       console.log(`v${ colors.red(major) }.${ colors.green(minor) }.${ colors.blue(patch) }`);
-      // resolve();
+      resolve();
     });
   }
 };

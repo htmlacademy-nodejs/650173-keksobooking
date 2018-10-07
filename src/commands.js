@@ -37,13 +37,18 @@ class Command {
   handle() {
     this.checkHelpCommand();
     this.checkAvailableCommands()
-      .then(() => Command.exitWithoutError());
-    // this.showErrorAndExit();
+      .then(() => Command.exitWithoutError())
+      .catch(() => this.showErrorAndExit());
   }
 
   checkAvailableCommands() {
     const commands = this.availableCommands.filter((command) => this.userCommand === command.name);
-    return Promise.all(commands.map((command) => command.execute()));
+
+    if (commands.length === 0) {
+      return new Promise(() => { throw `Commands not found` });
+    } else {
+      return Promise.all(commands.map((command) => command.execute()));
+    }
   }
 
   checkHelpCommand() {

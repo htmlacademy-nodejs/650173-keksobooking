@@ -31,6 +31,13 @@ class GenerateData {
   }
 
   start() {
+    return new Promise((resolve) => {
+      this.resolve = resolve;
+      this.offersCountStep();
+    });
+  }
+
+  offersCountStep() {
     rl.question(Questions.OFFERS_COUNT, (dataCount) => {
       this.dataCount = parseInt(dataCount, 0);
 
@@ -40,6 +47,7 @@ class GenerateData {
       } else {
         console.error(`You have an error. We can't generate an offers`);
         rl.close();
+        this.resolve();
       }
     });
   }
@@ -71,6 +79,7 @@ class GenerateData {
       .then(() => {
         console.log(`Data has been saved successfully`);
         rl.close();
+        this.resolve();
       })
       .catch((error) => console.log(`We have a problem on this: ${ error }`));
   }
@@ -82,7 +91,7 @@ class GenerateData {
         rl.close();
       } else {
         console.log(`Okay :(`);
-        process.exit(1);
+        this.resolve();
       }
     });
   }
