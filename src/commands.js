@@ -45,7 +45,9 @@ class Command {
     const commands = this.availableCommands.filter((command) => this.userCommand === command.name);
 
     if (commands.length === 0) {
-      return new Promise(() => { throw `Commands not found` });
+      return new Promise(() => {
+        throw new Error(`Commands not found`);
+      });
     } else {
       return Promise.all(commands.map((command) => command.execute()));
     }

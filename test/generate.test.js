@@ -15,6 +15,7 @@ describe(`Generate JSON command`, function () {
 
     return generateData.saveData(``)
       .then(() => assert.fail(`Path ${tempFileName} should not be available`))
+      .then(() => generateData.rl.close())
       .catch((e) => assert.ok(e));
   });
 
@@ -24,6 +25,7 @@ describe(`Generate JSON command`, function () {
 
     return generateData.saveData(``)
       .then(access(tempFileName))
+      .then(() => generateData.rl.close())
       .then(unlink(tempFileName));
   });
 });

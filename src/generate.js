@@ -4,10 +4,6 @@ const fs = require(`fs`);
 const Data = require(`../src/data`).Data;
 
 const readline = require(`readline`);
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
 
 const DefaulsFileParams = {
   NAME: `offers`,
@@ -24,6 +20,10 @@ class GenerateData {
   constructor(filePath) {
     this.dataCount = 1;
     this.filePath = filePath;
+    this.rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
   }
 
   static createFilePath(fileName) {
@@ -38,7 +38,7 @@ class GenerateData {
   }
 
   offersCountStep() {
-    rl.question(Questions.OFFERS_COUNT, (dataCount) => {
+    this.rl.question(Questions.OFFERS_COUNT, (dataCount) => {
       this.dataCount = parseInt(dataCount, 0);
 
       if (this.dataCount > 0) {
@@ -46,21 +46,21 @@ class GenerateData {
         this.fileNameStep();
       } else {
         console.error(`You have an error. We can't generate an offers`);
-        rl.close();
+        this.rl.close();
         this.resolve();
       }
     });
   }
 
   fileNameStep() {
-    rl.question(Questions.FILENAME, (fileName) => {
+    this.rl.question(Questions.FILENAME, (fileName) => {
       fileName = fileName.trim() === `` ? DefaulsFileParams.NAME : fileName;
       this.filePath = GenerateData.createFilePath(fileName);
 
       fs.access(this.filePath, fs.constants.F_OK, (err) => {
         if (err) {
           this.saveDataToFileStep();
-          rl.close();
+          this.rl.close();
         } else {
           this.rewriteFileStep();
         }
@@ -78,17 +78,17 @@ class GenerateData {
     this.saveData(fileData, this.filePath)
       .then(() => {
         console.log(`Data has been saved successfully`);
-        rl.close();
+        this.rl.close();
         this.resolve();
       })
       .catch((error) => console.log(`We have a problem on this: ${ error }`));
   }
 
   rewriteFileStep() {
-    rl.question(Questions.REWRITE_FILE, (answer) => {
+    this.rl.question(Questions.REWRITE_FILE, (answer) => {
       if (POSITIVE_ANSWERS.includes(answer)) {
         this.saveDataToFileStep();
-        rl.close();
+        this.rl.close();
       } else {
         console.log(`Okay :(`);
         this.resolve();
