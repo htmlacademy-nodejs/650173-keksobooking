@@ -11,6 +11,7 @@ const prettyCommandName = (command) => {
 module.exports = {
   name: `--help`,
   description: `Shows all commands with description`,
+  needToExit: true,
   execute(commands) {
     console.log(`Available commands:`);
     commands.forEach((command) => {

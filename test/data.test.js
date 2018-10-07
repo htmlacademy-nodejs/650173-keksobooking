@@ -12,7 +12,6 @@ describe(`Data.generate()`, () => {
     generatedData = Data.generate();
   });
 
-
   it(`should generate correct address`, () => {
     assert.strictEqual(`${generatedData.location.x}, ${generatedData.location.y}`, generatedData.offer.address);
   });

@@ -44,7 +44,9 @@ class Command {
     this.availableCommands.forEach((command) => {
       if (this.userCommand === command.name) {
         command.execute();
-        Command.exitWithoutError();
+        if (command.needToExit){
+          Command.exitWithoutError();
+        }
       }
     });
   }
