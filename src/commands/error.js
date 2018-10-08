@@ -6,12 +6,15 @@ const helpCommand = require(`./help`);
 
 module.exports = {
   execute(command) {
-    const unknownCommandMessage = util.format(`Unknown command: «%s».`, command);
-    const message = [
-      colors.red(unknownCommandMessage),
-      `Use "${ helpCommand.name }" for get available commands.`
-    ].join(`\n`);
+    return new Promise((resolve) => {
+      const unknownCommandMessage = util.format(`Unknown command: «%s».`, command);
+      const message = [
+        colors.red(unknownCommandMessage),
+        `Use "${ helpCommand.name }" for get available commands.`
+      ].join(`\n`);
 
-    console.error(message);
+      console.error(message);
+      resolve();
+    });
   }
 };

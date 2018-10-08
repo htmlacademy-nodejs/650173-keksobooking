@@ -7,6 +7,9 @@ module.exports = {
   name: `--author`,
   description: `Shows application author`,
   execute() {
-    console.log(`Author: ${ colors.red(packageInfo.author) }`);
+    return new Promise((resolve) => {
+      console.log(`Author: ${ colors.red(packageInfo.author) }`);
+      resolve();
+    });
   }
 };
