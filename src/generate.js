@@ -33,17 +33,17 @@ class GenerateData {
   start() {
     return new Promise((resolve) => {
       this.resolve = resolve;
-      this.offersCountStep();
+      this._offersCountStep();
     });
   }
 
-  offersCountStep() {
+  _offersCountStep() {
     this.rl.question(Questions.OFFERS_COUNT, (dataCount) => {
       this.dataCount = parseInt(dataCount, 0);
 
       if (this.dataCount > 0) {
         console.log(`Ok. Let's generate ${ this.dataCount } offers`);
-        this.fileNameStep();
+        this._fileNameStep();
       } else {
         console.error(`You have an error. We can't generate an offers`);
         this.rl.close();
@@ -52,30 +52,30 @@ class GenerateData {
     });
   }
 
-  fileNameStep() {
+  _fileNameStep() {
     this.rl.question(Questions.FILENAME, (fileName) => {
       fileName = fileName.trim() === `` ? DefaulsFileParams.NAME : fileName;
       this.filePath = GenerateData.createFilePath(fileName);
 
       fs.access(this.filePath, fs.constants.F_OK, (err) => {
         if (err) {
-          this.saveDataToFileStep();
+          this._saveDataToFileStep();
           this.rl.close();
         } else {
-          this.rewriteFileStep();
+          this._rewriteFileStep();
         }
       });
     });
   }
 
-  saveDataToFileStep() {
+  _saveDataToFileStep() {
     let fileData = [];
 
     for (let i = 0; i < this.dataCount; i++) {
       fileData.push(Data.generate());
     }
 
-    this.saveData(fileData, this.filePath)
+    this._saveData(fileData, this.filePath)
       .then(() => {
         console.log(`Data has been saved successfully`);
         this.rl.close();
@@ -84,10 +84,10 @@ class GenerateData {
       .catch((error) => console.log(`We have a problem on this: ${ error }`));
   }
 
-  rewriteFileStep() {
+  _rewriteFileStep() {
     this.rl.question(Questions.REWRITE_FILE, (answer) => {
       if (POSITIVE_ANSWERS.includes(answer)) {
-        this.saveDataToFileStep();
+        this._saveDataToFileStep();
         this.rl.close();
       } else {
         console.log(`Okay :(`);
@@ -96,7 +96,7 @@ class GenerateData {
     });
   }
 
-  saveData(fileData) {
+  _saveData(fileData) {
     console.log(`Saving data to file: ${this.filePath}`);
 
     const data = JSON.stringify(fileData);

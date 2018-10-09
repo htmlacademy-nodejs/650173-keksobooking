@@ -11,6 +11,7 @@ const prettyCommandName = (command) => {
 module.exports = {
   name: `--help`,
   description: `Shows all commands with description`,
+  userCommand: true,
   execute(commands) {
     return new Promise((resolve) => {
       console.log(`Available commands:`);
