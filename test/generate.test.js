@@ -13,7 +13,7 @@ describe(`Generate JSON command`, function () {
     const tempFileName = `${__dirname}/folder/testfile.json`;
     const generateData = new GenerateData(tempFileName);
 
-    return generateData.saveData(``)
+    return generateData._saveData(``)
       .then(() => assert.fail(`Path ${tempFileName} should not be available`))
       .then(() => generateData.rl.close())
       .catch((e) => assert.ok(e));
@@ -23,7 +23,7 @@ describe(`Generate JSON command`, function () {
     const tempFileName = `${__dirname}/testfile.json`;
     const generateData = new GenerateData(tempFileName);
 
-    return generateData.saveData(``)
+    return generateData._saveData(``)
       .then(access(tempFileName))
       .then(() => generateData.rl.close())
       .then(unlink(tempFileName));

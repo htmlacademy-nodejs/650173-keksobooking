@@ -5,6 +5,7 @@ const authorCommand = require(`./commands/author`);
 const helpCommand = require(`./commands/help`);
 const defaultCommand = require(`./commands/default`);
 const errorCommand = require(`./commands/error`);
+const serverCommand = require(`./commands/server`);
 
 const ExitStatuses = {
   OK: 1,
@@ -16,13 +17,10 @@ class Command {
     this.userCommand = userCommand;
     this.commands = [
       helpCommand,
-      versionCommand,
-      authorCommand
-    ];
-    this.availableCommands = [
       defaultCommand,
       versionCommand,
-      authorCommand
+      authorCommand,
+      serverCommand
     ];
   }
 
@@ -35,14 +33,16 @@ class Command {
   }
 
   handle() {
-    this.checkHelpCommand();
-    this.checkAvailableCommands()
+    this._checkHelpCommand();
+    this._checkCommands()
       .then(() => Command.exitWithoutError())
-      .catch(() => this.showErrorAndExit());
+      .catch(() => this._showErrorAndExit());
   }
 
-  checkAvailableCommands() {
-    const commands = this.availableCommands.filter((command) => this.userCommand === command.name);
+  _checkCommands() {
+    const commands = this.commands.filter((command) => {
+      return this.userCommand === command.name && this.userCommand !== helpCommand.name;
+    });
 
     if (commands.length === 0) {
       return new Promise(() => {
@@ -53,15 +53,15 @@ class Command {
     }
   }
 
-  checkHelpCommand() {
+  _checkHelpCommand() {
     if (this.userCommand === helpCommand.name) {
       helpCommand
-        .execute(this.commands)
+        .execute(this.commands.filter((command) => command.userCommand))
         .then(() => Command.exitWithoutError());
     }
   }
 
-  showErrorAndExit() {
+  _showErrorAndExit() {
     errorCommand
       .execute(this.userCommand)
       .then(() => Command.exitWithError());
