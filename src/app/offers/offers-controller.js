@@ -1,0 +1,43 @@
+'use strict';
+
+const Data = require(`../../data`).Data;
+const NotFoundError = require(`../errors/not-found-error`);
+
+const OFFERS = Array(10).fill(null).map(() => Data.generate());
+const Defaults = {
+  SKIP: 0,
+  LIMIT: 20
+};
+
+class OffersController {
+  static index(req, res) {
+    const skip = parseInt(req.query.skip || Defaults.SKIP, 10);
+    const limit = parseInt(req.query.limit || Defaults.LIMIT, 10);
+
+    const offers = OFFERS.slice(skip).slice(0, limit);
+    const response = {
+      data: offers,
+      skip,
+      limit,
+      total: offers.length
+    };
+
+    res.send(response);
+  }
+
+  static show(req, res) {
+    const offerDate = parseInt(req.params.date, 10);
+    const offer = OFFERS.find((it) => it.date === offerDate);
+
+    if (!offer) {
+      throw new NotFoundError(`Оффер с датой "${offerDate}" не найден`);
+    }
+
+    res.send(offer);
+  }
+}
+
+module.exports = {
+  OffersController,
+  offers: OFFERS
+};

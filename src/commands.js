@@ -35,7 +35,7 @@ class Command {
   handle() {
     this._checkHelpCommand();
     this._checkCommands()
-      .then(() => Command.exitWithoutError())
+      .then(Command.exitWithoutError)
       .catch(() => this._showErrorAndExit());
   }
 
@@ -57,14 +57,14 @@ class Command {
     if (this.userCommand === helpCommand.name) {
       helpCommand
         .execute(this.commands.filter((command) => command.userCommand))
-        .then(() => Command.exitWithoutError());
+        .then(Command.exitWithoutError);
     }
   }
 
   _showErrorAndExit() {
     errorCommand
       .execute(this.userCommand)
-      .then(() => Command.exitWithError());
+      .then(Command.exitWithError);
   }
 }
 
