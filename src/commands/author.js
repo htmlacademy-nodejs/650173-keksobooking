@@ -8,9 +8,6 @@ module.exports = {
   description: `Shows application author`,
   userCommand: true,
   execute() {
-    return new Promise((resolve) => {
-      console.log(`Author: ${ colors.red(packageInfo.author) }`);
-      resolve();
-    });
+    return Promise.resolve(console.log(`Author: ${ colors.red(packageInfo.author) }`));
   }
 };

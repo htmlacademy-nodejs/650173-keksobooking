@@ -1,6 +1,6 @@
 'use strict';
 
-const Server = require(`../server`);
+const Server = require(`../app/server`).Server;
 
 module.exports = {
   name: `--server`,
