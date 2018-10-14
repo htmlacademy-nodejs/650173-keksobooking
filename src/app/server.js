@@ -18,24 +18,20 @@ class Server {
     this.app = express();
     this.port = parseInt(port, 10);
 
-    this._setupServer();
+    this._setup();
   }
 
   start() {
     return new Promise(() => {
-      this._executeServer();
+      this.app.listen(this.port, () => console.log(`Server running at ${ this._serverAddress }`));
     });
   }
 
-  _setupServer() {
+  _setup() {
     this.app.use(express.static(`${__dirname}/../../static`));
     this.app.use(`/api/offers`, offersRouter);
     this.app.use(NOT_FOUND_HANDLER);
     this.app.use(ERROR_HANDLER);
-  }
-
-  _executeServer() {
-    this.app.listen(this.port, () => console.log(`Server running at ${ this._serverAddress }`));
   }
 
   get _serverAddress() {
