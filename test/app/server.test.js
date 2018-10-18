@@ -89,22 +89,65 @@ describe(`GET /api/offers/:date`, () => {
 
 
 describe(`POST /api/offers`, () => {
-  const offerAttributes = {
-    title: `title`
+  const validOfferAttributes = {
+    title: `1`.repeat(30),
+    type: `flat`,
+    price: 100,
+    address: `address`,
+    checkin: `10:15`,
+    checkout: `10:15`,
+    rooms: 2,
+    features: [`wifi`, `dishwasher`]
   };
+
+  const validationErrors = Object.keys(validOfferAttributes).map((key) => {
+    return {error: `Validation Error`, fieldName: key, errorMessage: `Invalid value`};
+  });
+
+  context(`when data is invalid and content type is json`, () => {
+    it(`returns array of errors`, async () => {
+      const response = await request(app).
+      post(`/api/offers`).
+      send({features: [`test`]}).
+      set(`Accept`, `application/json`).
+      set(`Content-Type`, `application/json`).
+      expect(400).
+      expect(`Content-Type`, /json/);
+
+      const offer = response.body;
+      assert.deepStrictEqual(offer, validationErrors);
+    });
+  });
+
+  context(`when data is invalid and content type is multipart/form-data`, () => {
+    it(`returns array of errors`, async () => {
+      const response = await request(app).
+      post(`/api/offers`).
+      field(`features`, [`test`]).
+      attach(`avatar`, `test/fixtures/file.txt`).
+      attach(`preview`, `test/fixtures/file.txt`).
+      set(`Accept`, `application/json`).
+      set(`Content-Type`, `multipart/form-data`).
+      expect(400).
+      expect(`Content-Type`, /json/);
+
+      const offer = response.body;
+      assert.deepStrictEqual(offer, validationErrors);
+    });
+  });
 
   context(`when content type is json`, () => {
     it(`returns offer`, async () => {
       const response = await request(app).
       post(`/api/offers`).
-      send(offerAttributes).
+      send(validOfferAttributes).
       set(`Accept`, `application/json`).
       set(`Content-Type`, `application/json`).
       expect(200).
       expect(`Content-Type`, /json/);
 
       const offer = response.body;
-      assert.deepStrictEqual(offer, offerAttributes);
+      assert.deepStrictEqual(offer, validOfferAttributes);
     });
   });
 
@@ -112,7 +155,14 @@ describe(`POST /api/offers`, () => {
     it(`returns offer`, async () => {
       const response = await request(app).
       post(`/api/offers`).
-      field(`title`, offerAttributes.title).
+      field(`title`, validOfferAttributes.title).
+      field(`type`, validOfferAttributes.type).
+      field(`price`, validOfferAttributes.price).
+      field(`address`, validOfferAttributes.address).
+      field(`checkin`, validOfferAttributes.checkin).
+      field(`checkout`, validOfferAttributes.checkout).
+      field(`rooms`, validOfferAttributes.rooms).
+      field(`features`, validOfferAttributes.features).
       attach(`avatar`, `test/fixtures/keks.png`).
       attach(`preview`, `test/fixtures/keks.png`).
       set(`Accept`, `application/json`).
@@ -121,7 +171,7 @@ describe(`POST /api/offers`, () => {
       expect(`Content-Type`, /json/);
 
       const offer = response.body;
-      assert.deepStrictEqual(offer, offerAttributes);
+      assert.deepStrictEqual(offer, validOfferAttributes);
     });
   });
 });

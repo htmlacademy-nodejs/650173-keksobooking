@@ -1,6 +1,9 @@
 'use strict';
 
-const Data = require(`../../data`).Data;
+const {validationResult} = require(`express-validator/check`);
+
+const {Data} = require(`../../data`);
+const {errorFormatter} = require(`./validation`);
 const NotFoundError = require(`../errors/not-found-error`);
 
 const OFFERS = Array(10).fill(null).map(() => Data.generate());
@@ -37,7 +40,13 @@ class OffersController {
   }
 
   static async create(req, res) {
-    res.send(req.body);
+    const result = validationResult(req).formatWith(errorFormatter);
+
+    if (!result.isEmpty()) {
+      res.status(400).json(result.array());
+    } else {
+      res.send(req.body);
+    }
   }
 }
 
