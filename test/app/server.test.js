@@ -86,3 +86,42 @@ describe(`GET /api/offers/:date`, () => {
     });
   });
 });
+
+
+describe(`POST /api/offers`, () => {
+  const offerAttributes = {
+    title: `title`
+  };
+
+  context(`when content type is json`, () => {
+    it(`returns offer`, async () => {
+      const response = await request(app).
+      post(`/api/offers`).
+      send(offerAttributes).
+      set(`Accept`, `application/json`).
+      set(`Content-Type`, `application/json`).
+      expect(200).
+      expect(`Content-Type`, /json/);
+
+      const offer = response.body;
+      assert.deepStrictEqual(offer, offerAttributes);
+    });
+  });
+
+  context(`when content type is multipart/form-data`, () => {
+    it(`returns offer`, async () => {
+      const response = await request(app).
+      post(`/api/offers`).
+      field(`title`, offerAttributes.title).
+      attach(`avatar`, `test/fixtures/keks.png`).
+      attach(`preview`, `test/fixtures/keks.png`).
+      set(`Accept`, `application/json`).
+      set(`Content-Type`, `multipart/form-data`).
+      expect(200).
+      expect(`Content-Type`, /json/);
+
+      const offer = response.body;
+      assert.deepStrictEqual(offer, offerAttributes);
+    });
+  });
+});

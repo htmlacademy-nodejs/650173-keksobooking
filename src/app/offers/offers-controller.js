@@ -10,7 +10,7 @@ const Defaults = {
 };
 
 class OffersController {
-  static index(req, res) {
+  static async index(req, res) {
     const skip = parseInt(req.query.skip || Defaults.SKIP, 10);
     const limit = parseInt(req.query.limit || Defaults.LIMIT, 10);
 
@@ -25,7 +25,7 @@ class OffersController {
     res.send(response);
   }
 
-  static show(req, res) {
+  static async show(req, res) {
     const offerDate = parseInt(req.params.date, 10);
     const offer = OFFERS.find((it) => it.date === offerDate);
 
@@ -34,6 +34,10 @@ class OffersController {
     }
 
     res.send(offer);
+  }
+
+  static async create(req, res) {
+    res.send(req.body);
   }
 }
 
