@@ -2,6 +2,7 @@
 
 const {randomElementFromArray} = require(`../../utils`);
 const {PreparedData} = require(`../../data`);
+
 const CLOCK_REGEXP = /^([0-1][0-9]|2[0-3]):([0-5][0-9])$/;
 
 const errorFormatter = ({msg, param}) => {
@@ -10,6 +11,16 @@ const errorFormatter = ({msg, param}) => {
     fieldName: param,
     errorMessage: msg
   };
+};
+
+const prepareInputData = (req, res, next) => {
+  const name = req.body.name;
+
+  if (!name || name && name.length === 0) {
+    req.body.name = randomElementFromArray(PreparedData.NAMES);
+  }
+
+  return next();
 };
 
 const schema = {
@@ -61,20 +72,9 @@ const schema = {
     },
   },
   name: {
-    // TODO: нужно, чтобы подставлялось значение, если нет
-    optional: true,
-    customSanitizer: {
-      options: (value) => {
-        if (value.length === 0) {
-          return randomElementFromArray(PreparedData.NAMES);
-        }
-
-        return value;
-      }
-    }
+    optional: true
   },
   avatar: {
-    optional: true,
     custom: {
       options: (_, {req}) => {
         if (req.files && req.files.avatar && req.files.avatar[0]) {
@@ -86,10 +86,9 @@ const schema = {
     }
   },
   preview: {
-    optional: true,
     custom: {
       options: (_, {req}) => {
-        if (req.files && req.files.avatar && req.files.avatar[0]) {
+        if (req.files && req.files.preview && req.files.preview[0]) {
           return !!req.files.preview[0].mimetype.match(/image/);
         }
 
@@ -101,5 +100,6 @@ const schema = {
 
 module.exports = {
   schema,
-  errorFormatter
+  errorFormatter,
+  prepareInputData
 };

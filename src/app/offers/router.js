@@ -5,7 +5,7 @@ const multer = require(`multer`);
 const {checkSchema} = require(`express-validator/check`);
 
 const {OffersController, offers} = require(`./offers-controller`);
-const {schema} = require(`./validation`);
+const {schema, prepareInputData} = require(`./validation`);
 
 // eslint-disable-next-line new-cap
 const offersRouter = express.Router();
@@ -17,7 +17,12 @@ const offerImages = memoryStorage.fields([{name: `avatar`, maxCount: 1}, {name: 
 offersRouter
   .get(``, asyncMiddleware(OffersController.index))
   .get(`/:date`, asyncMiddleware(OffersController.show))
-  .post(``, offerImages, checkSchema(schema), asyncMiddleware(OffersController.create));
+  .post(``,
+      offerImages,
+      prepareInputData,
+      checkSchema(schema),
+      asyncMiddleware(OffersController.create)
+  );
 
 module.exports = {
   offersRouter,
