@@ -3,6 +3,7 @@
 const request = require(`supertest`);
 const assert = require(`assert`);
 
+const {PreparedData} = require(`../../src/data`);
 const {Server, offers} = require(`../../src/app/server`);
 const app = new Server().app;
 
@@ -89,39 +90,98 @@ describe(`GET /api/offers/:date`, () => {
 
 
 describe(`POST /api/offers`, () => {
-  const offerAttributes = {
-    title: `title`
+  const validOfferAttributes = {
+    title: `1`.repeat(30),
+    type: `flat`,
+    price: 100,
+    address: `address`,
+    checkin: `10:15`,
+    checkout: `10:15`,
+    rooms: 2,
+    features: [`wifi`, `dishwasher`]
   };
+
+  const validationError = (key) => {
+    return {error: `Validation Error`, fieldName: key, errorMessage: `Invalid value`};
+  };
+
+  const validationErrors = Object.keys(validOfferAttributes).map((key) => validationError(key));
+
+  context(`when data is invalid and content type is json`, () => {
+    it(`returns array of errors`, async () => {
+      const response = await request(app).
+        post(`/api/offers`).
+        send({features: [`test`]}).
+        set(`Accept`, `application/json`).
+        set(`Content-Type`, `application/json`).
+        expect(400).
+        expect(`Content-Type`, /json/);
+
+      const offer = response.body;
+      assert.deepStrictEqual(offer, validationErrors);
+    });
+  });
+
+  context(`when data is invalid and content type is multipart/form-data`, () => {
+    const filesValidationErrors = [`avatar`, `preview`].map((key) => validationError(key));
+    const validationErrorsWithFiles = validationErrors.concat(filesValidationErrors);
+
+    it(`returns array of errors`, async () => {
+      const response = await request(app).
+        post(`/api/offers`).
+        field(`features`, [`test`]).
+        attach(`avatar`, `test/fixtures/file.txt`).
+        attach(`preview`, `test/fixtures/file.txt`).
+        set(`Accept`, `application/json`).
+        set(`Content-Type`, `multipart/form-data`).
+        expect(400).
+        expect(`Content-Type`, /json/);
+
+      const offer = response.body;
+      assert.deepStrictEqual(offer, validationErrorsWithFiles);
+    });
+  });
 
   context(`when content type is json`, () => {
     it(`returns offer`, async () => {
       const response = await request(app).
-      post(`/api/offers`).
-      send(offerAttributes).
-      set(`Accept`, `application/json`).
-      set(`Content-Type`, `application/json`).
-      expect(200).
-      expect(`Content-Type`, /json/);
+        post(`/api/offers`).
+        send(validOfferAttributes).
+        set(`Accept`, `application/json`).
+        set(`Content-Type`, `application/json`).
+        expect(200).
+        expect(`Content-Type`, /json/);
 
       const offer = response.body;
-      assert.deepStrictEqual(offer, offerAttributes);
+      assert(PreparedData.NAMES.includes(offer.name));
+      delete offer.name;
+      assert.deepStrictEqual(offer, validOfferAttributes);
     });
   });
 
   context(`when content type is multipart/form-data`, () => {
     it(`returns offer`, async () => {
       const response = await request(app).
-      post(`/api/offers`).
-      field(`title`, offerAttributes.title).
-      attach(`avatar`, `test/fixtures/keks.png`).
-      attach(`preview`, `test/fixtures/keks.png`).
-      set(`Accept`, `application/json`).
-      set(`Content-Type`, `multipart/form-data`).
-      expect(200).
-      expect(`Content-Type`, /json/);
+        post(`/api/offers`).
+        field(`title`, validOfferAttributes.title).
+        field(`type`, validOfferAttributes.type).
+        field(`price`, validOfferAttributes.price).
+        field(`address`, validOfferAttributes.address).
+        field(`checkin`, validOfferAttributes.checkin).
+        field(`checkout`, validOfferAttributes.checkout).
+        field(`rooms`, validOfferAttributes.rooms).
+        field(`features`, validOfferAttributes.features).
+        attach(`avatar`, `test/fixtures/keks.png`).
+        attach(`preview`, `test/fixtures/keks.png`).
+        set(`Accept`, `application/json`).
+        set(`Content-Type`, `multipart/form-data`).
+        expect(200).
+        expect(`Content-Type`, /json/);
 
       const offer = response.body;
-      assert.deepStrictEqual(offer, offerAttributes);
+      assert(PreparedData.NAMES.includes(offer.name));
+      delete offer.name;
+      assert.deepStrictEqual(offer, validOfferAttributes);
     });
   });
 });

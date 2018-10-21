@@ -1,12 +1,20 @@
 'use strict';
 
+const {
+  randomNumber,
+  randomElementFromArray,
+  shuffleArray,
+  dateOffset
+} = require(`./utils`);
+
 const PreparedData = {
+  NAMES: [`Keks`, `Pavel`, `Nikolay`, `Alex`, `Ulyana`, `Anastasyia`, `Julia`],
   TITLE: [
     `Большая уютная квартира`, `Маленькая неуютная квартира`, `Огромный прекрасный дворец`,
     `Маленький ужасный дворец`, `Красивый гостевой домик`, `Некрасивый негостеприимный домик`,
     `Уютное бунгало далеко от моря`, `Неуютное бунгало по колено в воде`
   ],
-  TYPE: [`flat`, `palace`, `house`, `bungalo`],
+  TYPES: [`flat`, `palace`, `house`, `bungalo`],
   TIMES: [`12:00`, `13:00`, `14:00`],
   FEATURES: [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`, `description`],
   PHOTOS: [
@@ -23,12 +31,6 @@ const PreparedData = {
   ROOMS: {MIN: 1, MAX: 5},
   PRICE: {MIN: 1000, MAX: 1000000}
 };
-const MS_IN_DAY = 24 * 60 * 60 * 1000;
-
-const randomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
-const randomElementFromArray = (array) => array[randomNumber(0, array.length - 1)];
-const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
-const dateOffset = (offset) => MS_IN_DAY * offset;
 
 class Data {
   static generate() {
@@ -73,7 +75,7 @@ class Data {
   }
 
   static type() {
-    return randomElementFromArray(PreparedData.TYPE);
+    return randomElementFromArray(PreparedData.TYPES);
   }
 
   static rooms() {

@@ -29,6 +29,7 @@ class Server {
 
   _setup() {
     this.app.use(express.static(`${__dirname}/../../static`));
+    this.app.use(express.json());
     this.app.use(`/api/offers`, offersRouter);
     this.app.use(NOT_FOUND_HANDLER);
     this.app.use(ERROR_HANDLER);
