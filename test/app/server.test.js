@@ -3,8 +3,10 @@
 const request = require(`supertest`);
 const assert = require(`assert`);
 
-const {PreparedData} = require(`../../src/data`);
-const {Server, offers} = require(`../../src/app/server`);
+const {PreparedData} = require(`../../src/data/data`);
+const offersStoreMock = require(`../mock/offers-store-mock`);
+const imagesStoreMock = require(`../mock/images-store-mock`);
+const Server = require(`../../src/app/server`)(offersStoreMock, imagesStoreMock, imagesStoreMock);
 const app = new Server().app;
 
 describe(`GET /api/offers`, () => {
@@ -17,8 +19,8 @@ describe(`GET /api/offers`, () => {
 
     const requestedOffers = response.body;
     assert.deepStrictEqual(requestedOffers, {
-      data: offers,
-      total: offers.length,
+      data: offersStoreMock.offers,
+      total: offersStoreMock.offers.length,
       skip: 0,
       limit: 20
     });
@@ -36,7 +38,7 @@ describe(`GET /api/offers`, () => {
         expect(`Content-Type`, /json/);
 
       const requestedOffers = response.body;
-      const partOfOffers = offers.slice(skip).slice(0, limit);
+      const partOfOffers = offersStoreMock.offers.slice(skip).slice(0, limit);
       assert.deepStrictEqual(requestedOffers, {
         data: partOfOffers,
         skip,
@@ -61,7 +63,7 @@ describe(`GET /api/offers`, () => {
 describe(`GET /api/offers/:date`, () => {
   context(`when offer exists`, () => {
     it(`returns correct offer`, async () => {
-      const offerDate = offers[0].date;
+      const offerDate = offersStoreMock.offers[0].date;
 
       const response = await request(app).
         get(`/api/offers/${offerDate}`).

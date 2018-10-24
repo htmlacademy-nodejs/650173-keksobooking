@@ -1,8 +1,7 @@
 'use strict';
 
 const assert = require(`assert`);
-const Data = require(`../src/data`).Data;
-const PreparedData = require(`../src/data`).PreparedData;
+const {Data, PreparedData} = require(`../../src/data/data`);
 
 let generatedData;
 
@@ -36,7 +35,7 @@ describe(`Data.generate()`, () => {
   });
 
   it(`should generate correct type`, () => {
-    assert(PreparedData.TYPE.includes(generatedData.offer.type));
+    assert(PreparedData.TYPES.includes(generatedData.offer.type));
   });
 
   it(`should generate correct features`, () => {

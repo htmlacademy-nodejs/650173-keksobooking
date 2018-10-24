@@ -1,16 +1,22 @@
 'use strict';
 
 const express = require(`express`);
-const {offersRouter, offers} = require(`./offers/router`);
+const {MongoError} = require(`mongodb`);
+const offersRouter = require(`./offers/router`);
 
 const NOT_FOUND_HANDLER = (req, res) => {
   res.status(404).send(`Page was not found`);
 };
 const ERROR_HANDLER = (err, req, res, _next) => {
-  if (err) {
-    console.error(err);
-    res.status(err.code || 500).send(err.message);
+  console.error(err);
+
+  if (err instanceof MongoError) {
+    res.status(400).json(err.message);
+
+    return;
   }
+
+  res.status(err.code || 500).send(err.message);
 };
 
 class Server {
@@ -28,6 +34,10 @@ class Server {
   }
 
   _setup() {
+    offersRouter.store = Server.store;
+    offersRouter.avatarStore = Server.avatarStore;
+    offersRouter.previewStore = Server.previewStore;
+
     this.app.use(express.static(`${__dirname}/../../static`));
     this.app.use(express.json());
     this.app.use(`/api/offers`, offersRouter);
@@ -40,7 +50,10 @@ class Server {
   }
 }
 
-module.exports = {
-  Server,
-  offers
+module.exports = (store, avatarStore, previewStore) => {
+  Server.store = store;
+  Server.avatarStore = avatarStore;
+  Server.previewStore = previewStore;
+
+  return Server;
 };

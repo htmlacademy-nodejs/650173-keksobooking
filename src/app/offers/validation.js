@@ -1,7 +1,7 @@
 'use strict';
 
-const {randomElementFromArray} = require(`../../utils`);
-const {PreparedData} = require(`../../data`);
+const Utils = require(`../../utils`);
+const {PreparedData} = require(`../../data/data`);
 
 const CLOCK_REGEXP = /^([0-1][0-9]|2[0-3]):([0-5][0-9])$/;
 
@@ -17,7 +17,7 @@ const prepareInputData = (req, res, next) => {
   const name = req.body.name;
 
   if (!name || name && name.length === 0) {
-    req.body.name = randomElementFromArray(PreparedData.NAMES);
+    req.body.name = Utils.randomElementFromArray(PreparedData.NAMES);
   }
 
   return next();

@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require(`fs`);
-const Data = require(`../src/data`).Data;
+const {Data} = require(`./data`);
 
 const readline = require(`readline`);
 

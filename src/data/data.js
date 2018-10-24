@@ -1,11 +1,6 @@
 'use strict';
 
-const {
-  randomNumber,
-  randomElementFromArray,
-  shuffleArray,
-  dateOffset
-} = require(`./utils`);
+const Utils = require(`../utils`);
 
 const PreparedData = {
   NAMES: [`Keks`, `Pavel`, `Nikolay`, `Alex`, `Ulyana`, `Anastasyia`, `Julia`],
@@ -54,16 +49,16 @@ class Data {
         photos: Data.photos()
       },
       location,
-      date: Data.date(randomNumber(0, PreparedData.DAYS_OFFSET))
+      date: Data.date(Utils.randomNumber(0, PreparedData.DAYS_OFFSET))
     };
   }
 
   static avatar() {
-    return `https://robohash.org/${randomNumber(1, 1000)}-${randomNumber(1, 1000)}`;
+    return `https://robohash.org/${Utils.randomNumber(1, 1000)}-${Utils.randomNumber(1, 1000)}`;
   }
 
   static title() {
-    return randomElementFromArray(PreparedData.TITLE);
+    return Utils.randomElementFromArray(PreparedData.TITLE);
   }
 
   static address(location) {
@@ -71,31 +66,31 @@ class Data {
   }
 
   static price() {
-    return randomNumber(PreparedData.PRICE.MIN, PreparedData.PRICE.MAX);
+    return Utils.randomNumber(PreparedData.PRICE.MIN, PreparedData.PRICE.MAX);
   }
 
   static type() {
-    return randomElementFromArray(PreparedData.TYPES);
+    return Utils.randomElementFromArray(PreparedData.TYPES);
   }
 
   static rooms() {
-    return randomNumber(PreparedData.ROOMS.MIN, PreparedData.ROOMS.MAX);
+    return Utils.randomNumber(PreparedData.ROOMS.MIN, PreparedData.ROOMS.MAX);
   }
 
   static guests() {
-    return randomNumber(PreparedData.GUESTS.MIN, PreparedData.GUESTS.MAX);
+    return Utils.randomNumber(PreparedData.GUESTS.MIN, PreparedData.GUESTS.MAX);
   }
 
   static checkin() {
-    return randomElementFromArray(PreparedData.TIMES);
+    return Utils.randomElementFromArray(PreparedData.TIMES);
   }
 
   static checkout() {
-    return randomElementFromArray(PreparedData.TIMES);
+    return Utils.randomElementFromArray(PreparedData.TIMES);
   }
 
   static features() {
-    return shuffleArray(PreparedData.FEATURES).slice(0, randomNumber(1, PreparedData.FEATURES.length));
+    return Utils.shuffleArray(PreparedData.FEATURES).slice(0, Utils.randomNumber(1, PreparedData.FEATURES.length));
   }
 
   static description() {
@@ -103,18 +98,18 @@ class Data {
   }
 
   static photos() {
-    return shuffleArray(PreparedData.PHOTOS);
+    return Utils.shuffleArray(PreparedData.PHOTOS);
   }
 
   static location() {
     return {
-      x: randomNumber(PreparedData.LOCATION.X.MIN, PreparedData.LOCATION.X.MAX),
-      y: randomNumber(PreparedData.LOCATION.Y.MIN, PreparedData.LOCATION.Y.MAX)
+      x: Utils.randomNumber(PreparedData.LOCATION.X.MIN, PreparedData.LOCATION.X.MAX),
+      y: Utils.randomNumber(PreparedData.LOCATION.Y.MIN, PreparedData.LOCATION.Y.MAX)
     };
   }
 
   static date(offset) {
-    return (new Date().getTime() - dateOffset(offset)) / 1000 | 0;
+    return (new Date().getTime() - Utils.dateOffset(offset)) / 1000 | 0;
   }
 }
 
