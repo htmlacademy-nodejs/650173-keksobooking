@@ -65,7 +65,6 @@ class OffersController {
       throw new NotFoundError(`Аватар для оффера с датой "${offerDate}" не найден`);
     }
 
-    res.header(`Content-Type`, `image/jpg`);
     res.header(`Content-Length`, avatar.info.length);
 
     res.on(`error`, (e) => console.error(e));

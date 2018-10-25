@@ -92,6 +92,45 @@ describe(`GET /api/offers/:date`, () => {
   });
 });
 
+describe(`GET /api/offers/:date/avatar`, () => {
+  context(`when offer exists`, () => {
+    it(`returns correct offer's avatar`, async () => {
+      const offerDate = offersStoreMock.offers[0].date;
+
+      return await request(app).
+        get(`/api/offers/${offerDate}/avatar`).
+        set(`Accept`, `image/png`).
+        expect(200).
+        expect(`Content-Type`, /image/);
+    });
+  });
+
+  context(`when avatar for offer does not exist`, () => {
+    it(`returns 404`, async () => {
+      const offerDate = offersStoreMock.offers[0].date;
+
+      return await request(app).
+        get(`/api/offers/${offerDate}/avatar`).
+        set(`Accept`, `application/json`).
+        expect(404).
+        expect(`Аватар для оффера с датой "${offerDate}" не найден`).
+        expect(`Content-Type`, /html/);
+    });
+  });
+
+  context(`when offer does not exist`, () => {
+    it(`returns 404`, async () => {
+      const offerDate = 12345;
+
+      return await request(app).
+        get(`/api/offers/${offerDate}/avatar`).
+        set(`Accept`, `application/json`).
+        expect(404).
+        expect(`Оффер с датой "${offerDate}" не найден`).
+        expect(`Content-Type`, /html/);
+    });
+  });
+});
 
 describe(`POST /api/offers`, () => {
   const validOfferAttributes = {

@@ -1,14 +1,15 @@
 'use strict';
 
-class ImagesMockStore {
+const fs = require(`fs`);
 
-  async get() {
+class ImagesMockStore {
+  async get(_id) {
+    return await fs.readFile(`./test/fixtures/keks.png`);
   }
 
   async save() {
-
+    return true;
   }
-
 }
 
 module.exports = new ImagesMockStore();
