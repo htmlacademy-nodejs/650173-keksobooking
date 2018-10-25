@@ -2,7 +2,6 @@
 
 const express = require(`express`);
 const {MongoError} = require(`mongodb`);
-const offersRouter = require(`./offers/router`);
 
 const NOT_FOUND_HANDLER = (req, res) => {
   res.status(404).send(`Page was not found`);
@@ -34,13 +33,9 @@ class Server {
   }
 
   _setup() {
-    offersRouter.store = Server.store;
-    offersRouter.avatarStore = Server.avatarStore;
-    offersRouter.previewStore = Server.previewStore;
-
     this.app.use(express.static(`${__dirname}/../../static`));
     this.app.use(express.json());
-    this.app.use(`/api/offers`, offersRouter);
+    this.app.use(`/api/offers`, Server.router);
     this.app.use(NOT_FOUND_HANDLER);
     this.app.use(ERROR_HANDLER);
   }
@@ -50,10 +45,8 @@ class Server {
   }
 }
 
-module.exports = (store, avatarStore, previewStore) => {
-  Server.store = store;
-  Server.avatarStore = avatarStore;
-  Server.previewStore = previewStore;
+module.exports = (router) => {
+  Server.router = router;
 
   return Server;
 };

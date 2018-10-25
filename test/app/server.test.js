@@ -6,7 +6,9 @@ const assert = require(`assert`);
 const {PreparedData} = require(`../../src/data/data`);
 const offersStoreMock = require(`../mock/offers-store-mock`);
 const imagesStoreMock = require(`../mock/images-store-mock`);
-const Server = require(`../../src/app/server`)(offersStoreMock, imagesStoreMock, imagesStoreMock);
+const offersController = require(`../../src/app/offers/offers-controller`)(offersStoreMock, imagesStoreMock, imagesStoreMock);
+const offersRouter = require(`../../src/app/offers/router`)(offersController);
+const Server = require(`../../src/app/server`)(offersRouter);
 const app = new Server().app;
 
 describe(`GET /api/offers`, () => {
@@ -43,7 +45,7 @@ describe(`GET /api/offers`, () => {
         data: partOfOffers,
         skip,
         limit,
-        total: partOfOffers.length
+        total: offersStoreMock.offers.length
       });
     });
   });

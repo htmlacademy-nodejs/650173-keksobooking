@@ -3,6 +3,7 @@
 const {validationResult} = require(`express-validator/check`);
 const toStream = require(`buffer-to-stream`);
 
+const Utils = require(`../../utils`);
 const {DefaultsPageSettings} = require(`../../constants`);
 const {errorFormatter} = require(`./validation`);
 const NotFoundError = require(`../errors/not-found-error`);
@@ -12,15 +13,8 @@ class OffersController {
     const skip = parseInt(req.query.skip || DefaultsPageSettings.SKIP, 10);
     const limit = parseInt(req.query.limit || DefaultsPageSettings.LIMIT, 10);
 
-    const offers = OffersController.store.getAllOffers(skip, limit);
-    const response = {
-      data: offers,
-      skip,
-      limit,
-      total: offers.length
-    };
-
-    res.send(response);
+    const offers = (await Utils.toPage(await OffersController.store.getAllOffers(), skip, limit));
+    res.send(offers);
   }
 
   static async show(req, res) {
@@ -83,4 +77,11 @@ class OffersController {
   }
 }
 
-module.exports = OffersController;
+module.exports = (store, avatarStore, previewStore) => {
+  OffersController.store = store;
+  OffersController.avatarStore = avatarStore;
+  OffersController.previewStore = previewStore;
+
+  return OffersController;
+};
+

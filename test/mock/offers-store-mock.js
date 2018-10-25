@@ -12,7 +12,7 @@ class OffersStoreMock {
     return this.offers.filter((it) => it.date === date)[0];
   }
 
-  async getAllOffers(_skip, _limit) {
+  async getAllOffers() {
     return new Cursor(this.offers);
   }
 
@@ -24,4 +24,12 @@ class OffersStoreMock {
 
 }
 
-module.exports = new OffersStoreMock([Data.generate()]);
+module.exports = (() => {
+  let offers = [];
+
+  for (let i = 0; i < 5; i++) {
+    offers.push(Data.generate());
+  }
+
+  return new OffersStoreMock(offers);
+})();

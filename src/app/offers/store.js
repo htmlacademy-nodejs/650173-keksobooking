@@ -1,7 +1,6 @@
 'use strict';
 
 const db = require(`../../db`);
-const Utils = require(`../../utils`);
 
 const setupCollection = async () => {
   const dBase = await db;
@@ -19,10 +18,8 @@ class OffersStore {
     return (await this.collection).findOne({date});
   }
 
-  async getAllOffers(skip, limit) {
-    const result = (await this.collection).find();
-
-    return Utils.toPage(result, skip, limit);
+  async getAllOffers() {
+    return (await this.collection).find();
   }
 
   async save(offerData) {
