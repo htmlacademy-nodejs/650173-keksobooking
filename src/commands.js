@@ -7,6 +7,7 @@ const helpCommand = require(`./commands/help`);
 const defaultCommand = require(`./commands/default`);
 const errorCommand = require(`./commands/error`);
 const serverCommand = require(`./commands/server`);
+const fillCommand = require(`./commands/fill`);
 
 class Command {
   constructor(userCommand) {
@@ -16,7 +17,8 @@ class Command {
       defaultCommand,
       versionCommand,
       authorCommand,
-      serverCommand
+      serverCommand,
+      fillCommand
     ];
   }
 
