@@ -107,7 +107,7 @@ describe(`GET /api/offers/:date/avatar`, () => {
 
   context(`when avatar for offer does not exist`, () => {
     it(`returns 404`, async () => {
-      const offerDate = offersStoreMock.offers[0].date;
+      const offerDate = offersStoreMock.offers[1].date;
 
       return await request(app).
         get(`/api/offers/${offerDate}/avatar`).

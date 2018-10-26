@@ -47,4 +47,4 @@ class ImageStore {
 
 }
 
-module.exports = new ImageStore();
+module.exports = ImageStore;

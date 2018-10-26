@@ -28,7 +28,9 @@ module.exports = (() => {
   let offers = [];
 
   for (let i = 0; i < 5; i++) {
-    offers.push(Data.generate());
+    const offer = Data.generate();
+    offer._id = i;
+    offers.push(offer);
   }
 
   return new OffersStoreMock(offers);
