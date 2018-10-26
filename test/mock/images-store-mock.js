@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require(`fs`);
-
 class FakeStream {
   async on() {
     return true;
@@ -13,8 +11,8 @@ class FakeStream {
 }
 
 class FakeImage {
-  async info() {
-    return await fs.readFileAsync(`./test/fixtures/keks.png`);
+  get info() {
+    return {contentType: `image/jpeg`, length: 100};
   }
 
   get stream() {
