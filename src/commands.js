@@ -1,16 +1,13 @@
 'use strict';
 
+const {ExitStatuses} = require(`./constants`);
 const versionCommand = require(`./commands/version`);
 const authorCommand = require(`./commands/author`);
 const helpCommand = require(`./commands/help`);
 const defaultCommand = require(`./commands/default`);
 const errorCommand = require(`./commands/error`);
 const serverCommand = require(`./commands/server`);
-
-const ExitStatuses = {
-  OK: 1,
-  ERROR: 0
-};
+const fillCommand = require(`./commands/fill`);
 
 class Command {
   constructor(userCommand) {
@@ -20,7 +17,8 @@ class Command {
       defaultCommand,
       versionCommand,
       authorCommand,
-      serverCommand
+      serverCommand,
+      fillCommand
     ];
   }
 

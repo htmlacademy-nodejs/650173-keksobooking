@@ -1,7 +1,7 @@
 'use strict';
 
 const packageInfo = require(`../../package.json`);
-const GenerateData = require(`../generate`);
+const GenerateData = require(`../data/generate`);
 
 module.exports = {
   name: undefined,

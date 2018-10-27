@@ -1,36 +1,25 @@
 'use strict';
 
 const {validationResult} = require(`express-validator/check`);
+const toStream = require(`buffer-to-stream`);
 
-const {Data} = require(`../../data`);
+const Utils = require(`../../utils`);
+const {DefaultsPageSettings} = require(`../../constants`);
 const {errorFormatter} = require(`./validation`);
 const NotFoundError = require(`../errors/not-found-error`);
 
-const OFFERS = Array(10).fill(null).map(() => Data.generate());
-const Defaults = {
-  SKIP: 0,
-  LIMIT: 20
-};
-
 class OffersController {
   static async index(req, res) {
-    const skip = parseInt(req.query.skip || Defaults.SKIP, 10);
-    const limit = parseInt(req.query.limit || Defaults.LIMIT, 10);
+    const skip = parseInt(req.query.skip || DefaultsPageSettings.SKIP, 10);
+    const limit = parseInt(req.query.limit || DefaultsPageSettings.LIMIT, 10);
 
-    const offers = OFFERS.slice(skip).slice(0, limit);
-    const response = {
-      data: offers,
-      skip,
-      limit,
-      total: offers.length
-    };
-
-    res.send(response);
+    const offers = (await Utils.toPage(await OffersController.store.getAllOffers(), skip, limit));
+    res.send(offers);
   }
 
   static async show(req, res) {
     const offerDate = parseInt(req.params.date, 10);
-    const offer = OFFERS.find((it) => it.date === offerDate);
+    const offer = await OffersController.store.getOffer(offerDate);
 
     if (!offer) {
       throw new NotFoundError(`Оффер с датой "${offerDate}" не найден`);
@@ -40,17 +29,60 @@ class OffersController {
   }
 
   static async create(req, res) {
-    const result = validationResult(req).formatWith(errorFormatter);
+    const validationCheckResult = validationResult(req).formatWith(errorFormatter);
 
-    if (!result.isEmpty()) {
-      res.status(400).json(result.array());
+    if (!validationCheckResult.isEmpty()) {
+      res.status(400).json(validationCheckResult.array());
     } else {
+      const result = await OffersController.store.save(req.body);
+      const insertedId = result.insertedId;
+
+      if (req.files) {
+        if (req.files.avatar && req.files.avatar[0]) {
+          await OffersController.avatarStore.save(insertedId, toStream(req.files.avatar[0].buffer));
+        }
+
+        if (req.files.avatar && req.files.preview[0]) {
+          await OffersController.previewStore.save(insertedId, toStream(req.files.preview[0].buffer));
+        }
+      }
+
       res.send(req.body);
     }
   }
+
+  static async avatar(req, res) {
+    const offerDate = parseInt(req.params.date, 10);
+    const offer = await OffersController.store.getOffer(offerDate);
+
+    if (!offer) {
+      throw new NotFoundError(`Оффер с датой "${offerDate}" не найден`);
+    }
+
+    const avatar = await OffersController.avatarStore.get(offer._id);
+
+    if (!avatar) {
+      throw new NotFoundError(`Аватар для оффера с датой "${offerDate}" не найден`);
+    }
+
+    res.header(`Content-Type`, avatar.info.contentType);
+    res.header(`Content-Length`, avatar.info.length);
+
+    res.on(`error`, (error) => console.error(error));
+    res.on(`end`, () => res.end());
+
+    const stream = avatar.stream;
+    stream.on(`error`, (error) => console.error(error));
+    stream.on(`end`, () => res.end());
+    stream.pipe(res);
+  }
 }
 
-module.exports = {
-  OffersController,
-  offers: OFFERS
+module.exports = (store, avatarStore, previewStore) => {
+  OffersController.store = store;
+  OffersController.avatarStore = avatarStore;
+  OffersController.previewStore = previewStore;
+
+  return OffersController;
 };
+

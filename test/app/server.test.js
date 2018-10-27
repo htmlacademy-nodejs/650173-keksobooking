@@ -3,8 +3,12 @@
 const request = require(`supertest`);
 const assert = require(`assert`);
 
-const {PreparedData} = require(`../../src/data`);
-const {Server, offers} = require(`../../src/app/server`);
+const {PreparedData} = require(`../../src/data/data`);
+const offersStoreMock = require(`../mock/offers-store-mock`);
+const imagesStoreMock = require(`../mock/images-store-mock`);
+const offersController = require(`../../src/app/offers/offers-controller`)(offersStoreMock, imagesStoreMock, imagesStoreMock);
+const offersRouter = require(`../../src/app/offers/router`)(offersController);
+const Server = require(`../../src/app/server`)(offersRouter);
 const app = new Server().app;
 
 describe(`GET /api/offers`, () => {
@@ -17,8 +21,8 @@ describe(`GET /api/offers`, () => {
 
     const requestedOffers = response.body;
     assert.deepStrictEqual(requestedOffers, {
-      data: offers,
-      total: offers.length,
+      data: offersStoreMock.offers,
+      total: offersStoreMock.offers.length,
       skip: 0,
       limit: 20
     });
@@ -36,12 +40,12 @@ describe(`GET /api/offers`, () => {
         expect(`Content-Type`, /json/);
 
       const requestedOffers = response.body;
-      const partOfOffers = offers.slice(skip).slice(0, limit);
+      const partOfOffers = offersStoreMock.offers.slice(skip).slice(0, limit);
       assert.deepStrictEqual(requestedOffers, {
         data: partOfOffers,
         skip,
         limit,
-        total: partOfOffers.length
+        total: offersStoreMock.offers.length
       });
     });
   });
@@ -61,7 +65,7 @@ describe(`GET /api/offers`, () => {
 describe(`GET /api/offers/:date`, () => {
   context(`when offer exists`, () => {
     it(`returns correct offer`, async () => {
-      const offerDate = offers[0].date;
+      const offerDate = offersStoreMock.offers[0].date;
 
       const response = await request(app).
         get(`/api/offers/${offerDate}`).
@@ -88,6 +92,45 @@ describe(`GET /api/offers/:date`, () => {
   });
 });
 
+describe(`GET /api/offers/:date/avatar`, () => {
+  context(`when offer exists`, () => {
+    it(`returns correct offer's avatar`, async () => {
+      const offerDate = offersStoreMock.offers[0].date;
+
+      return await request(app).
+        get(`/api/offers/${offerDate}/avatar`).
+        set(`Accept`, `image/png`).
+        expect(200).
+        expect(`Content-Type`, /image/);
+    });
+  });
+
+  context(`when avatar for offer does not exist`, () => {
+    it(`returns 404`, async () => {
+      const offerDate = offersStoreMock.offers[1].date;
+
+      return await request(app).
+        get(`/api/offers/${offerDate}/avatar`).
+        set(`Accept`, `application/json`).
+        expect(404).
+        expect(`Аватар для оффера с датой "${offerDate}" не найден`).
+        expect(`Content-Type`, /html/);
+    });
+  });
+
+  context(`when offer does not exist`, () => {
+    it(`returns 404`, async () => {
+      const offerDate = 12345;
+
+      return await request(app).
+        get(`/api/offers/${offerDate}/avatar`).
+        set(`Accept`, `application/json`).
+        expect(404).
+        expect(`Оффер с датой "${offerDate}" не найден`).
+        expect(`Content-Type`, /html/);
+    });
+  });
+});
 
 describe(`POST /api/offers`, () => {
   const validOfferAttributes = {

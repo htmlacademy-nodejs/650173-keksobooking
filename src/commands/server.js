@@ -1,6 +1,12 @@
 'use strict';
 
-const Server = require(`../app/server`).Server;
+const ImageStore = require(`../app/images/store`);
+const offersStore = require(`../app/offers/store`);
+const offersController = require(`../../src/app/offers/offers-controller`)(
+    offersStore, new ImageStore(`avatars`), new ImageStore(`previews`)
+);
+const offersRouter = require(`../../src/app/offers/router`)(offersController);
+const Server = require(`../../src/app/server`)(offersRouter);
 
 module.exports = {
   name: `--server`,
