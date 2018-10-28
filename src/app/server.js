@@ -1,25 +1,11 @@
 'use strict';
 
-require('dotenv').config();
+require(`dotenv`).config();
 
 const express = require(`express`);
-const {MongoError} = require(`mongodb`);
 const logger = require(`../logger`);
-
-const NOT_FOUND_HANDLER = (req, res) => {
-  res.status(404).send(`Page was not found`);
-};
-const ERROR_HANDLER = (err, req, res, _next) => {
-  console.error(err);
-
-  if (err instanceof MongoError) {
-    res.status(400).json(err.message);
-
-    return;
-  }
-
-  res.status(err.code || 500).send(err.message);
-};
+const {NOT_FOUND_HANDLER} = require(`./errors/not-found-error`);
+const ERROR_HANDLER = require(`./errors/errors-handler`);
 
 const {
   SERVER_PORT = 3000,

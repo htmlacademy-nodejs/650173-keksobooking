@@ -6,7 +6,7 @@ const toStream = require(`buffer-to-stream`);
 const Utils = require(`../../utils`);
 const {DefaultsPageSettings} = require(`../../constants`);
 const {errorFormatter} = require(`./validation`);
-const NotFoundError = require(`../errors/not-found-error`);
+const {NotFoundError} = require(`../errors/not-found-error`);
 
 class OffersController {
   static async index(req, res) {
