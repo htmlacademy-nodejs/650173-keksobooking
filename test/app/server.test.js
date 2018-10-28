@@ -94,7 +94,8 @@ describe(`GET /api/offers/:date`, () => {
 
 describe(`GET /api/offers/:date/avatar`, () => {
   context(`when offer exists`, () => {
-    const offerDate = offersStoreMock.offers.find((offer) => offer._id === 0).date;
+    const offerWithAvatar = offersStoreMock.offers.find((offer) => offer._id === 0);
+    const offerDate = offerWithAvatar.date;
 
     it(`returns correct offer's avatar`, async () => {
       return await request(app).
@@ -106,7 +107,8 @@ describe(`GET /api/offers/:date/avatar`, () => {
   });
 
   context(`when avatar for offer does not exist`, () => {
-    const offerDate = offersStoreMock.offers.find((offer) => offer._id === 1).date;
+    const offerWithoutAvatar = offersStoreMock.offers.find((offer) => offer._id === 1);
+    const offerDate = offerWithoutAvatar.date;
 
     it(`returns 404`, async () => {
       return await request(app).
