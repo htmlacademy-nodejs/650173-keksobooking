@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 const express = require(`express`);
 const {MongoError} = require(`mongodb`);
 
@@ -18,8 +20,13 @@ const ERROR_HANDLER = (err, req, res, _next) => {
   res.status(err.code || 500).send(err.message);
 };
 
+const {
+  SERVER_PORT = 3000,
+  SERVER_HOST = `localhost`
+} = process.env;
+
 class Server {
-  constructor(port = 3000) {
+  constructor(port = SERVER_PORT) {
     this.app = express();
     this.port = parseInt(port, 10);
 
@@ -28,7 +35,7 @@ class Server {
 
   start() {
     return new Promise(() => {
-      this.app.listen(this.port, () => console.log(`Server running at ${ this._serverAddress }`));
+      this.app.listen(this.port, SERVER_HOST, () => console.log(`Server running at ${ this._serverAddress }`));
     });
   }
 
@@ -41,7 +48,7 @@ class Server {
   }
 
   get _serverAddress() {
-    return `http://localhost:${ this.port }/`;
+    return `http://${ SERVER_HOST }:${ this.port }/`;
   }
 }
 

@@ -1,9 +1,13 @@
 'use strict';
 
+require('dotenv').config();
+
 const {MongoClient} = require(`mongodb`);
 const {ExitStatuses} = require(`./constants`);
 
-const MONGO_URL = `mongodb://localhost:27017`;
+const {
+  MONGO_URL = `mongodb://localhost:27017`
+} = process.env;
 
 module.exports = MongoClient.
   connect(MONGO_URL, {useNewUrlParser: true}).
