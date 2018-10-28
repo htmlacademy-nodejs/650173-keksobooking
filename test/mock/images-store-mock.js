@@ -22,7 +22,7 @@ class FakeImage {
 
 class ImagesMockStore {
   async get(id) {
-    if (id === 0) {
+    if (id === 0 || id === `0-0`) {
       return await new FakeImage();
     } else {
       return false;

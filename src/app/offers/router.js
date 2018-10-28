@@ -18,6 +18,7 @@ const router = (controller) => {
     get(``, asyncMiddleware(controller.index)).
     get(`/:date`, asyncMiddleware(controller.show)).
     get(`/:date/avatar`, asyncMiddleware(controller.avatar)).
+    get(`/:date/preview/:id`, asyncMiddleware(controller.preview)).
     post(``,
         offerImages,
         prepareInputData,

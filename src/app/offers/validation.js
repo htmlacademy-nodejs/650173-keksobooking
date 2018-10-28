@@ -3,7 +3,10 @@
 const Utils = require(`../../utils`);
 const {PreparedData} = require(`../../data/data`);
 
-const CLOCK_REGEXP = /^([0-1][0-9]|2[0-3]):([0-5][0-9])$/;
+const Regexps = {
+  CLOCK: /^([0-1][0-9]|2[0-3]):([0-5][0-9])$/,
+  ADDRESS: /^[\d]+,[\s]?[\d]+$/
+};
 
 const errorFormatter = ({msg, param}) => {
   return {
@@ -31,9 +34,10 @@ const schema = {
   },
   type: {
     optional: false,
-    exists: true,
-    isIn: {
-      options: PreparedData.TYPES
+    custom: {
+      options: (value) => {
+        return PreparedData.TYPES.includes(value);
+      }
     }
   },
   price: {
@@ -43,18 +47,18 @@ const schema = {
     toInt: true
   },
   address: {
-    isLength: {
-      options: {min: 1, max: 100}
+    matches: {
+      options: Regexps.ADDRESS
     }
   },
   checkin: {
     matches: {
-      options: CLOCK_REGEXP
+      options: Regexps.CLOCK
     }
   },
   checkout: {
     matches: {
-      options: CLOCK_REGEXP
+      options: Regexps.CLOCK
     }
   },
   rooms: {
@@ -69,7 +73,7 @@ const schema = {
       options: (value) => {
         return Array.from(value).every((elem) => PreparedData.FEATURES.indexOf(elem) > -1);
       }
-    },
+    }
   },
   name: {
     optional: true

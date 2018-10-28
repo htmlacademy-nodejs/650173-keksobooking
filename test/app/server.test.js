@@ -134,12 +134,54 @@ describe(`GET /api/offers/:date/avatar`, () => {
   });
 });
 
+describe(`GET /api/offers/:date/preview/:id`, () => {
+  context(`when offer exists`, () => {
+    const offerWithPreview = offersStoreMock.offers.find((offer) => offer._id === 0);
+    const offerDate = offerWithPreview.date;
+
+    it(`returns correct offer's avatar`, async () => {
+      return await request(app).
+        get(`/api/offers/${offerDate}/preview/0`).
+        set(`Accept`, `image/jpeg`).
+        expect(200).
+        expect(`Content-Type`, `image/jpeg`);
+    });
+  });
+
+  context(`when preview for offer does not exist`, () => {
+    const offerWithoutPreview = offersStoreMock.offers.find((offer) => offer._id === 1);
+    const offerDate = offerWithoutPreview.date;
+
+    it(`returns 404`, async () => {
+      return await request(app).
+        get(`/api/offers/${offerDate}/preview/1`).
+        set(`Accept`, `application/json`).
+        expect(404).
+        expect(`Фото для оффера с датой "${offerDate}" не найдено`).
+        expect(`Content-Type`, /html/);
+    });
+  });
+
+  context(`when offer does not exist`, () => {
+    it(`returns 404`, async () => {
+      const offerDate = 12345;
+
+      return await request(app).
+        get(`/api/offers/${offerDate}/preview/0`).
+        set(`Accept`, `application/json`).
+        expect(404).
+        expect(`Оффер с датой "${offerDate}" не найден`).
+        expect(`Content-Type`, /html/);
+    });
+  });
+});
+
 describe(`POST /api/offers`, () => {
   const validOfferAttributes = {
     title: `1`.repeat(30),
-    type: `flat`,
+    type: `palace`,
     price: 100,
-    address: `address`,
+    address: `350, 450`,
     checkin: `10:15`,
     checkout: `10:15`,
     rooms: 2,
