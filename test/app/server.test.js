@@ -94,21 +94,21 @@ describe(`GET /api/offers/:date`, () => {
 
 describe(`GET /api/offers/:date/avatar`, () => {
   context(`when offer exists`, () => {
-    it(`returns correct offer's avatar`, async () => {
-      const offerDate = offersStoreMock.offers[0].date;
+    const offerDate = offersStoreMock.offers.find((offer) => offer._id === 0).date;
 
+    it(`returns correct offer's avatar`, async () => {
       return await request(app).
         get(`/api/offers/${offerDate}/avatar`).
-        set(`Accept`, `image/png`).
+        set(`Accept`, `image/jpeg`).
         expect(200).
-        expect(`Content-Type`, /image/);
+        expect(`Content-Type`, `image/jpeg`);
     });
   });
 
   context(`when avatar for offer does not exist`, () => {
-    it(`returns 404`, async () => {
-      const offerDate = offersStoreMock.offers[1].date;
+    const offerDate = offersStoreMock.offers.find((offer) => offer._id === 1).date;
 
+    it(`returns 404`, async () => {
       return await request(app).
         get(`/api/offers/${offerDate}/avatar`).
         set(`Accept`, `application/json`).

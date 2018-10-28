@@ -42,7 +42,7 @@ class OffersController {
           await OffersController.avatarStore.save(insertedId, toStream(req.files.avatar[0].buffer));
         }
 
-        if (req.files.avatar && req.files.preview[0]) {
+        if (req.files.preview && req.files.preview[0]) {
           await OffersController.previewStore.save(insertedId, toStream(req.files.preview[0].buffer));
         }
       }
