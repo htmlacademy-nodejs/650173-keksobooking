@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const express = require(`express`);
 const {MongoError} = require(`mongodb`);
+const logger = require(`../logger`);
 
 const NOT_FOUND_HANDLER = (req, res) => {
   res.status(404).send(`Page was not found`);
@@ -35,7 +36,7 @@ class Server {
 
   start() {
     return new Promise(() => {
-      this.app.listen(this.port, SERVER_HOST, () => console.log(`Server running at ${ this._serverAddress }`));
+      this.app.listen(this.port, SERVER_HOST, () => logger.info(`Server running at ${ this._serverAddress }`));
     });
   }
 

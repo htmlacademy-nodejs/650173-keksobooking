@@ -2,7 +2,6 @@
 
 const fs = require(`fs`);
 const {Data} = require(`./data`);
-
 const readline = require(`readline`);
 
 const DefaulsFileParams = {
