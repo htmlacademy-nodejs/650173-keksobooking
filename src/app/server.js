@@ -6,6 +6,7 @@ const express = require(`express`);
 const logger = require(`../logger`);
 const {NOT_FOUND_HANDLER} = require(`./errors/not-found-error`);
 const ERROR_HANDLER = require(`./errors/errors-handler`);
+const ALLOW_CORS = require(`./allow-cors.js`);
 
 const {
   SERVER_PORT = 3000,
@@ -30,6 +31,7 @@ class Server {
     this.app.use(express.static(`${__dirname}/../../static`));
     this.app.use(express.json());
     this.app.use(`/api/offers`, Server.router);
+    this.app.use(ALLOW_CORS);
     this.app.use(NOT_FOUND_HANDLER);
     this.app.use(ERROR_HANDLER);
   }
