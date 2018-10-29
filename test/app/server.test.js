@@ -94,7 +94,7 @@ describe(`GET /api/offers/:date`, () => {
 
 describe(`GET /api/offers/:date/avatar`, () => {
   context(`when offer exists`, () => {
-    const offerWithAvatar = offersStoreMock.offers.find((offer) => offer._id === 0);
+    const offerWithAvatar = offersStoreMock.offers.find((offer) => offer._id === 1);
     const offerDate = offerWithAvatar.date;
 
     it(`returns correct offer's avatar`, async () => {
@@ -107,7 +107,7 @@ describe(`GET /api/offers/:date/avatar`, () => {
   });
 
   context(`when avatar for offer does not exist`, () => {
-    const offerWithoutAvatar = offersStoreMock.offers.find((offer) => offer._id === 1);
+    const offerWithoutAvatar = offersStoreMock.offers.find((offer) => offer._id === 2);
     const offerDate = offerWithoutAvatar.date;
 
     it(`returns 404`, async () => {
@@ -136,12 +136,12 @@ describe(`GET /api/offers/:date/avatar`, () => {
 
 describe(`GET /api/offers/:date/preview/:id`, () => {
   context(`when offer exists`, () => {
-    const offerWithPreview = offersStoreMock.offers.find((offer) => offer._id === 0);
+    const offerWithPreview = offersStoreMock.offers.find((offer) => offer._id === 1);
     const offerDate = offerWithPreview.date;
 
     it(`returns correct offer's avatar`, async () => {
       return await request(app).
-        get(`/api/offers/${offerDate}/preview/0`).
+        get(`/api/offers/${offerDate}/preview/1`).
         set(`Accept`, `image/jpeg`).
         expect(200).
         expect(`Content-Type`, `image/jpeg`);
@@ -149,12 +149,12 @@ describe(`GET /api/offers/:date/preview/:id`, () => {
   });
 
   context(`when preview for offer does not exist`, () => {
-    const offerWithoutPreview = offersStoreMock.offers.find((offer) => offer._id === 1);
+    const offerWithoutPreview = offersStoreMock.offers.find((offer) => offer._id === 2);
     const offerDate = offerWithoutPreview.date;
 
     it(`returns 404`, async () => {
       return await request(app).
-        get(`/api/offers/${offerDate}/preview/1`).
+        get(`/api/offers/${offerDate}/preview/2`).
         set(`Accept`, `application/json`).
         expect(404).
         expect(`Фото для оффера с датой "${offerDate}" не найдено`).
@@ -239,10 +239,35 @@ describe(`POST /api/offers`, () => {
         expect(200).
         expect(`Content-Type`, /json/);
 
-      const offer = response.body;
-      assert(PreparedData.NAMES.includes(offer.name));
-      delete offer.name;
-      assert.deepStrictEqual(offer, validOfferAttributes);
+      const result = response.body;
+      assert(PreparedData.NAMES.includes(result.author.name));
+      assert.deepStrictEqual(result.offer.photos, []);
+      delete result.offer.photos;
+      assert.deepStrictEqual(result.offer, validOfferAttributes);
+    });
+  });
+
+  context(`when content type is json and features and preview are empty`, () => {
+    it(`returns offer`, async () => {
+      const offerAttributes = Object.assign({}, validOfferAttributes);
+      delete offerAttributes.preview;
+      delete offerAttributes.features;
+
+      const response = await request(app).
+        post(`/api/offers`).
+        send(offerAttributes).
+        set(`Accept`, `application/json`).
+        set(`Content-Type`, `application/json`).
+        expect(200).
+        expect(`Content-Type`, /json/);
+
+      const result = response.body;
+      assert(PreparedData.NAMES.includes(result.author.name));
+      assert.deepStrictEqual(result.offer.photos, []);
+      assert.deepStrictEqual(result.offer.features, []);
+      delete result.offer.photos;
+      delete result.offer.features;
+      assert.deepStrictEqual(result.offer, offerAttributes);
     });
   });
 
@@ -265,10 +290,10 @@ describe(`POST /api/offers`, () => {
         expect(200).
         expect(`Content-Type`, /json/);
 
-      const offer = response.body;
-      assert(PreparedData.NAMES.includes(offer.name));
-      delete offer.name;
-      assert.deepStrictEqual(offer, validOfferAttributes);
+      const result = response.body;
+      delete result.offer.photos;
+      assert(PreparedData.NAMES.includes(result.author.name));
+      assert.deepStrictEqual(result.offer, validOfferAttributes);
     });
   });
 });

@@ -7,15 +7,7 @@ const Utils = require(`../../utils`);
 const {DefaultsPageSettings} = require(`../../constants`);
 const {errorFormatter} = require(`./validation`);
 const {NotFoundError} = require(`../errors/not-found-error`);
-
-const getLocationFromAddress = (address) => {
-  const [x, y] = address.replace(` `, ``).split(`,`);
-
-  return {
-    x: parseInt(x, 10),
-    y: parseInt(y, 10)
-  };
-};
+const prepareData = require(`./prepare-data`);
 
 const saveImages = async (insertedId, files) => {
   if (files) {
@@ -23,7 +15,7 @@ const saveImages = async (insertedId, files) => {
       await OffersController.avatarStore.save(insertedId, toStream(files.avatar[0].buffer));
     }
 
-    if (files.preview && files.preview[0]) {
+    if (files.preview) {
       await files.preview.forEach((preview, index) => {
         OffersController.previewStore.save(`${insertedId}-${index}`, toStream(preview.buffer));
       });
@@ -54,28 +46,6 @@ const renderImage = (image, offerDate, res) => {
   return stream.pipe(res);
 };
 
-const prepareData = ({body, files}) => {
-  const offer = Object.assign({}, body);
-  const date = (new Date()).getTime();
-
-  const location = getLocationFromAddress(offer.address);
-  const author = {name: offer.name};
-  delete offer.name;
-
-  if (files) {
-    if (files.avatar && files.avatar[0]) {
-      author.avatar = `/api/offers/${date}/avatar`;
-      delete offer.avatar;
-    }
-
-    if (files.preview) {
-      offer.photos = files.preview.map((p, i) => `/api/offers/${date}/preview/${i}`);
-      delete offer.preview;
-    }
-  }
-
-  return {author, offer, location, date};
-};
 
 class OffersController {
   static async index(req, res) {
@@ -109,7 +79,7 @@ class OffersController {
 
       saveImages(insertedId, req.files);
 
-      res.send(req.body);
+      res.send(preparedData);
     }
   }
 

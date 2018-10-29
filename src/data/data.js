@@ -33,7 +33,8 @@ class Data {
 
     return {
       author: {
-        avatar: Data.avatar()
+        avatar: Data.avatar(),
+        name: Data.name()
       },
       offer: {
         title: Data.title(),
@@ -51,6 +52,10 @@ class Data {
       location,
       date: Data.date(Utils.randomNumber(0, PreparedData.DAYS_OFFSET))
     };
+  }
+
+  static name() {
+    return Utils.randomElementFromArray(PreparedData.NAMES);
   }
 
   static avatar() {

@@ -6,7 +6,6 @@ const {Data, PreparedData} = require(`../../src/data/data`);
 let generatedData;
 
 describe(`Data.generate()`, () => {
-
   before(function () {
     generatedData = Data.generate();
   });
@@ -55,6 +54,10 @@ describe(`Data.generate()`, () => {
   });
 
   describe(`author`, () => {
+    it(`should generate correct name`, () => {
+      assert(PreparedData.NAMES.includes(generatedData.author.name));
+    });
+
     it(`should generate correct avatar`, () => {
       assert(generatedData.author.avatar.includes(`https://robohash.org/`));
     });

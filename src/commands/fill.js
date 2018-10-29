@@ -1,10 +1,12 @@
 'use strict';
 
+const FillDatabase = require(`../data/fill-database`);
+
 module.exports = {
   name: `--fill`,
   description: `Fill the database`,
   userCommand: true,
   execute() {
-    return Promise.resolve(``);
+    return new FillDatabase().start();
   }
 };

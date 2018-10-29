@@ -92,8 +92,8 @@ const schema = {
   preview: {
     custom: {
       options: (_, {req}) => {
-        if (req.files && req.files.preview && req.files.preview[0]) {
-          return !!req.files.preview[0].mimetype.match(/image/);
+        if (req.files && req.files.preview) {
+          return req.files.preview.every((preview) => !!preview.mimetype.match(/image/));
         }
 
         return true;
