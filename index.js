@@ -1,6 +1,11 @@
 'use strict';
 
-const Command = require(`./src/commands`).command;
+const Command = require(`./src/command`);
+const DefaultCommand = require(`./src/commands/default`);
 const userCommand = process.argv[2];
 
-new Command(userCommand).handle();
+if (!userCommand) {
+  new DefaultCommand(Command).execute();
+} else {
+  new Command(userCommand).handle();
+}

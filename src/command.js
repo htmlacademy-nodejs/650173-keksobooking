@@ -4,7 +4,6 @@ const {ExitStatuses} = require(`./constants`);
 const versionCommand = require(`./commands/version`);
 const authorCommand = require(`./commands/author`);
 const helpCommand = require(`./commands/help`);
-const defaultCommand = require(`./commands/default`);
 const errorCommand = require(`./commands/error`);
 const serverCommand = require(`./commands/server`);
 const fillCommand = require(`./commands/fill`);
@@ -14,7 +13,6 @@ class Command {
     this.userCommand = userCommand;
     this.commands = [
       helpCommand,
-      defaultCommand,
       versionCommand,
       authorCommand,
       serverCommand,
@@ -66,6 +64,4 @@ class Command {
   }
 }
 
-module.exports = {
-  command: Command
-};
+module.exports = Command;
