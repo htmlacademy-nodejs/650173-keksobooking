@@ -127,7 +127,7 @@ describe(`GET /api/offers/:date/avatar`, () => {
       return await request(app).
         get(`/api/offers/${offerDate}/avatar`).
         set(`Accept`, `application/json`).
-        expect(404).
+        expect(400).
         expect(`Оффер с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
     });
@@ -169,7 +169,7 @@ describe(`GET /api/offers/:date/preview/:id`, () => {
       return await request(app).
         get(`/api/offers/${offerDate}/preview/0`).
         set(`Accept`, `application/json`).
-        expect(404).
+        expect(400).
         expect(`Оффер с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
     });

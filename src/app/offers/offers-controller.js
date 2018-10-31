@@ -7,6 +7,7 @@ const Utils = require(`../../utils`);
 const {DefaultsPageSettings} = require(`../../constants`);
 const {errorFormatter} = require(`./validation`);
 const {NotFoundError} = require(`../errors/not-found-error`);
+const BadRequestError = require(`../errors/bad-request-error`);
 const prepareData = require(`./prepare-data`);
 
 const saveImages = async (insertedId, files) => {
@@ -27,7 +28,7 @@ const findOffer = async (offerDate) => {
   const offer = await OffersController.store.getOffer(offerDate);
 
   if (!offer) {
-    throw new NotFoundError(`Оффер с датой "${offerDate}" не найден`);
+    throw new BadRequestError(`Оффер с датой "${offerDate}" не найден`);
   }
 
   return offer;
