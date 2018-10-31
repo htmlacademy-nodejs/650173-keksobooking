@@ -14,10 +14,17 @@ const app = new Server().app;
 
 describe(`DELETE /api/offers`, () => {
   it(`returns NOT IMPLEMENTED ERROR(501)`, async () => {
-    await request(app).
+    const response = await request(app).
       del(`/api/offers`).
       expect(501).
-      expect(`Content-Type`, /html/);
+      expect(`Content-Type`, /json/);
+
+    assert.deepStrictEqual(response.body, [
+      {
+        error: `Not Implemented Error`,
+        errorMessage: `DELETE is not implemented`
+      }
+    ])
   });
 });
 
