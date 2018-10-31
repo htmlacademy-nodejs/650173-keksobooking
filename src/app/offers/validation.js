@@ -63,7 +63,7 @@ const schema = {
   },
   rooms: {
     isInt: {
-      options: {gt: 0, lt: 100}
+      options: {gt: 0, lt: 1000}
     },
     toInt: true
   },

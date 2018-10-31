@@ -23,7 +23,7 @@ const PreparedData = {
     Y: {MIN: 150, MAX: 500}
   },
   GUESTS: {MIN: 1, MAX: 10},
-  ROOMS: {MIN: 1, MAX: 5},
+  ROOMS: {MIN: 0, MAX: 1000},
   PRICE: {MIN: 1000, MAX: 1000000}
 };
 
