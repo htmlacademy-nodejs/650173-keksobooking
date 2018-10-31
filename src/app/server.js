@@ -1,7 +1,5 @@
 'use strict';
 
-require(`dotenv`).config();
-
 const express = require(`express`);
 const logger = require(`../logger`);
 const {NOT_FOUND_HANDLER} = require(`./errors/not-found-error`);

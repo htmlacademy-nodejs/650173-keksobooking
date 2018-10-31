@@ -1,7 +1,5 @@
 'use strict';
 
-require(`dotenv`).config();
-
 const {MongoClient} = require(`mongodb`);
 const {ExitStatuses} = require(`./constants`);
 const logger = require(`./logger`);

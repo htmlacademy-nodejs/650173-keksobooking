@@ -1,9 +1,10 @@
 'use strict';
 
 const {MongoError} = require(`mongodb`);
+const logger = require(`../../logger`);
 
 const ERROR_HANDLER = (err, req, res, _next) => {
-  console.error(err);
+  logger.error(err);
 
   if (err instanceof MongoError) {
     res.status(400).json(err.message);
