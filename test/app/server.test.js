@@ -24,7 +24,7 @@ describe(`DELETE /api/offers`, () => {
         error: `Not Implemented Error`,
         errorMessage: `DELETE is not implemented`
       }
-    ])
+    ]);
   });
 });
 
@@ -64,6 +64,18 @@ describe(`GET /api/offers`, () => {
         limit,
         total: offersStoreMock.offers.length
       });
+    });
+
+    it(`returns 400 when skip or limit are not correct`, async () => {
+      const skip = `str`;
+      const limit = `str2`;
+
+      await request(app).
+        get(`/api/offers?skip=${skip}&limit=${limit}`).
+        set(`Accept`, `application/json`).
+        expect(400).
+        expect(`Params skip or limit are not correct`).
+        expect(`Content-Type`, /html/);
     });
   });
 

@@ -47,11 +47,19 @@ const renderImage = (image, offerDate, res) => {
   return stream.pipe(res);
 };
 
+const isNotNumber = (param) => param && isNaN(parseInt(param, 10));
 
 class OffersController {
   static async index(req, res) {
-    const skip = parseInt(req.query.skip || DefaultsPageSettings.SKIP, 10);
-    const limit = parseInt(req.query.limit || DefaultsPageSettings.LIMIT, 10);
+    let skip;
+    let limit;
+
+    if (isNotNumber(req.query.skip) || isNotNumber(req.query.limit)) {
+      throw new BadRequestError(`Params skip or limit are not correct`);
+    } else {
+      skip = parseInt(req.query.skip || DefaultsPageSettings.SKIP, 10);
+      limit = parseInt(req.query.limit || DefaultsPageSettings.LIMIT, 10);
+    }
 
     const offers = (await Utils.toPage(await OffersController.store.getAllOffers(), skip, limit));
     res.send(offers);
