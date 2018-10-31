@@ -11,6 +11,16 @@ const offersRouter = require(`../../src/app/offers/router`)(offersController);
 const Server = require(`../../src/app/server`)(offersRouter);
 const app = new Server().app;
 
+
+describe(`DELETE /api/offers`, () => {
+  it(`returns NOT IMPLEMENTED ERROR(501)`, async () => {
+    await request(app).
+      del(`/api/offers`).
+      expect(501).
+      expect(`Content-Type`, /html/);
+  });
+});
+
 describe(`GET /api/offers`, () => {
   it(`returns all offers`, async () => {
     const response = await request(app).
