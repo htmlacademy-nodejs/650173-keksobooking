@@ -11,7 +11,7 @@ const PreparedData = {
   ],
   TYPES: [`flat`, `palace`, `house`, `bungalo`],
   TIMES: [`12:00`, `13:00`, `14:00`],
-  FEATURES: [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`, `description`],
+  FEATURES: [`wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`],
   PHOTOS: [
     `http://o0.github.io/assets/images/tokyo/hotel1.jpg`,
     `http://o0.github.io/assets/images/tokyo/hotel2.jpg`,
