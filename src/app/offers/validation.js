@@ -17,10 +17,14 @@ const errorFormatter = ({msg, param}) => {
 };
 
 const prepareInputData = (req, res, next) => {
-  const name = req.body.name;
+  const {name, features} = req.body;
 
   if (!name || name && name.length === 0) {
     req.body.name = Utils.randomElementFromArray(PreparedData.NAMES);
+  }
+
+  if (features) {
+    req.body.features = [].concat(features);
   }
 
   return next();

@@ -257,6 +257,25 @@ describe(`POST /api/offers`, () => {
     });
   });
 
+  context(`when content type is json and features is string`, () => {
+    it(`returns offer`, async () => {
+      validOfferAttributes.features = `wifi`;
+
+      const response = await request(app).
+        post(`/api/offers`).
+        send(validOfferAttributes).
+        set(`Accept`, `application/json`).
+        set(`Content-Type`, `application/json`).
+        expect(200).
+        expect(`Content-Type`, /json/);
+
+      const result = response.body;
+      delete result.offer.photos;
+      validOfferAttributes.features = [`wifi`];
+      assert.deepStrictEqual(result.offer, validOfferAttributes);
+    });
+  });
+
   context(`when content type is json and features and preview are empty`, () => {
     it(`returns offer`, async () => {
       const offerAttributes = Object.assign({}, validOfferAttributes);
