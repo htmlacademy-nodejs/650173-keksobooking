@@ -13,12 +13,16 @@ const prepareData = require(`./prepare-data`);
 const saveImages = async (insertedId, files) => {
   if (files) {
     if (files.avatar && files.avatar[0]) {
-      await OffersController.avatarStore.save(insertedId, toStream(files.avatar[0].buffer));
+      await OffersController.avatarStore.save(
+          insertedId, toStream(files.avatar[0].buffer), files.avatar[0].mimetype
+      );
     }
 
     if (files.preview) {
       await files.preview.forEach((preview, index) => {
-        OffersController.previewStore.save(`${insertedId}-${index}`, toStream(preview.buffer));
+        OffersController.previewStore.save(
+            `${insertedId}-${index}`, toStream(preview.buffer), preview.mimetype
+        );
       });
     }
   }
