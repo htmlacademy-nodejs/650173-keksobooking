@@ -20,9 +20,13 @@ class Server {
     this._setup();
   }
 
+  get serverAddress() {
+    return `http://${ SERVER_HOST }:${ this.port }/`;
+  }
+
   start() {
     return new Promise(() => {
-      this.app.listen(this.port, SERVER_HOST, () => logger.info(`Server running at ${ this._serverAddress }`));
+      this.app.listen(this.port, SERVER_HOST, () => logger.info(`Server running at ${ this.serverAddress }`));
     });
   }
 
@@ -34,10 +38,6 @@ class Server {
     this.app.use(ALLOW_CORS);
     this.app.use(NOT_FOUND_HANDLER);
     this.app.use(ERROR_HANDLER);
-  }
-
-  get _serverAddress() {
-    return `http://${ SERVER_HOST }:${ this.port }/`;
   }
 }
 

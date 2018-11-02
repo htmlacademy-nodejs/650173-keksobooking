@@ -25,10 +25,6 @@ class GenerateData {
     });
   }
 
-  static createFilePath(fileName) {
-    return `${process.cwd()}/tmp/${fileName}.json`;
-  }
-
   start() {
     return new Promise((resolve) => {
       this.resolve = resolve;
@@ -109,6 +105,10 @@ class GenerateData {
         return success();
       });
     });
+  }
+
+  static createFilePath(fileName) {
+    return `${process.cwd()}/tmp/${fileName}.json`;
   }
 }
 

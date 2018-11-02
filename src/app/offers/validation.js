@@ -20,7 +20,7 @@ const prepareInputData = (req, res, next) => {
   const {name, features} = req.body;
 
   if (!name || name && name.length === 0) {
-    req.body.name = Utils.randomElementFromArray(PreparedData.NAMES);
+    req.body.name = Utils.getRandomElementFromArray(PreparedData.NAMES);
   }
 
   if (features) {

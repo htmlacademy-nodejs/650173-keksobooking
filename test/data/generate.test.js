@@ -8,8 +8,8 @@ const GenerateData = require(`../../src/data/generate`);
 const access = promisify(fs.access);
 const unlink = promisify(fs.unlink);
 
-describe(`Generate JSON command`, function () {
-  it(`should fail on non existing folder`, function () {
+describe(`Generate JSON command`, () => {
+  it(`should fail on non existing folder`, () => {
     const tempFileName = `${__dirname}/folder/testfile.json`;
     const generateData = new GenerateData(tempFileName);
 

@@ -29,92 +29,92 @@ const PreparedData = {
 
 class Data {
   static generate() {
-    const location = Data.location();
+    const location = Data.getLocation();
 
     return {
       author: {
-        avatar: Data.avatar(),
-        name: Data.name()
+        avatar: Data.getAvatar(),
+        name: Data.getName()
       },
       offer: {
-        title: Data.title(),
-        address: Data.address(location),
-        price: Data.price(),
-        type: Data.type(),
-        rooms: Data.rooms(),
-        guests: Data.guests(),
-        checkin: Data.checkin(),
-        checkout: Data.checkout(),
-        features: Data.features(),
-        description: Data.description(),
-        photos: Data.photos()
+        title: Data.getTitle(),
+        address: Data.getAddress(location),
+        price: Data.getPrice(),
+        type: Data.getType(),
+        rooms: Data.getRooms(),
+        guests: Data.getGuests(),
+        checkin: Data.getCheckin(),
+        checkout: Data.getCheckout(),
+        features: Data.getFeatures(),
+        description: Data.getDescription(),
+        photos: Data.getPhotos()
       },
       location,
-      date: Data.date(Utils.randomNumber(0, PreparedData.DAYS_OFFSET))
+      date: Data.getDate(Utils.getRandomNumber(0, PreparedData.DAYS_OFFSET))
     };
   }
 
-  static name() {
-    return Utils.randomElementFromArray(PreparedData.NAMES);
+  static getName() {
+    return Utils.getRandomElementFromArray(PreparedData.NAMES);
   }
 
-  static avatar() {
-    return `https://robohash.org/${Utils.randomNumber(1, 1000)}-${Utils.randomNumber(1, 1000)}`;
+  static getAvatar() {
+    return `https://robohash.org/${Utils.getRandomNumber(1, 1000)}-${Utils.getRandomNumber(1, 1000)}`;
   }
 
-  static title() {
-    return Utils.randomElementFromArray(PreparedData.TITLE);
+  static getTitle() {
+    return Utils.getRandomElementFromArray(PreparedData.TITLE);
   }
 
-  static address(location) {
-    return `${ location.x }, ${ location.y }`;
+  static getAddress(getLocation) {
+    return `${ getLocation.x }, ${ getLocation.y }`;
   }
 
-  static price() {
-    return Utils.randomNumber(PreparedData.PRICE.MIN, PreparedData.PRICE.MAX);
+  static getPrice() {
+    return Utils.getRandomNumber(PreparedData.PRICE.MIN, PreparedData.PRICE.MAX);
   }
 
-  static type() {
-    return Utils.randomElementFromArray(PreparedData.TYPES);
+  static getType() {
+    return Utils.getRandomElementFromArray(PreparedData.TYPES);
   }
 
-  static rooms() {
-    return Utils.randomNumber(PreparedData.ROOMS.MIN, PreparedData.ROOMS.MAX);
+  static getRooms() {
+    return Utils.getRandomNumber(PreparedData.ROOMS.MIN, PreparedData.ROOMS.MAX);
   }
 
-  static guests() {
-    return Utils.randomNumber(PreparedData.GUESTS.MIN, PreparedData.GUESTS.MAX);
+  static getGuests() {
+    return Utils.getRandomNumber(PreparedData.GUESTS.MIN, PreparedData.GUESTS.MAX);
   }
 
-  static checkin() {
-    return Utils.randomElementFromArray(PreparedData.TIMES);
+  static getCheckin() {
+    return Utils.getRandomElementFromArray(PreparedData.TIMES);
   }
 
-  static checkout() {
-    return Utils.randomElementFromArray(PreparedData.TIMES);
+  static getCheckout() {
+    return Utils.getRandomElementFromArray(PreparedData.TIMES);
   }
 
-  static features() {
-    return Utils.shuffleArray(PreparedData.FEATURES).slice(0, Utils.randomNumber(1, PreparedData.FEATURES.length));
+  static getFeatures() {
+    return Utils.shuffleArray(PreparedData.FEATURES).slice(0, Utils.getRandomNumber(1, PreparedData.FEATURES.length));
   }
 
-  static description() {
+  static getDescription() {
     return ``;
   }
 
-  static photos() {
+  static getPhotos() {
     return Utils.shuffleArray(PreparedData.PHOTOS);
   }
 
-  static location() {
+  static getLocation() {
     return {
-      x: Utils.randomNumber(PreparedData.LOCATION.X.MIN, PreparedData.LOCATION.X.MAX),
-      y: Utils.randomNumber(PreparedData.LOCATION.Y.MIN, PreparedData.LOCATION.Y.MAX)
+      x: Utils.getRandomNumber(PreparedData.LOCATION.X.MIN, PreparedData.LOCATION.X.MAX),
+      y: Utils.getRandomNumber(PreparedData.LOCATION.Y.MIN, PreparedData.LOCATION.Y.MAX)
     };
   }
 
-  static date(offset) {
-    return (new Date().getTime() - Utils.dateOffset(offset)) / 1000 | 0;
+  static getDate(offset) {
+    return (new Date().getTime() - Utils.getDateOffset(offset)) / 1000 | 0;
   }
 }
 
