@@ -33,12 +33,12 @@ class ImageStore {
     return {info: entity, stream: bucket.openDownloadStreamByName(filename)};
   }
 
-  async save(filename, stream) {
+  async save(filename, stream, contentType) {
     const bucket = await this.getBucket();
 
     return new Promise((success, fail) => {
       stream.pipe(
-          bucket.openUploadStream(filename)
+          bucket.openUploadStream(filename, {contentType})
       ).
       on(`error`, fail).
       on(`finish`, success);

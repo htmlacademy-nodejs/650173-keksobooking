@@ -21,16 +21,19 @@ class OffersStoreMock {
       insertedId: 42
     };
   }
-
 }
 
 module.exports = (() => {
-  let offers = [];
+  const offers = [];
 
-  for (let i = 0; i < 5; i++) {
-    const offer = Data.generate();
-    offer._id = i;
-    offers.push(offer);
+  for (let i = 0; i < 2; i++) {
+    const generatedOffer = Data.generate();
+    // It's random problem of offer generate, it can be not unique
+    if (offers.find((offer) => offer.date === generatedOffer.date)) {
+      generatedOffer.date += 1;
+    }
+    generatedOffer._id = i + 1;
+    offers.push(generatedOffer);
   }
 
   return new OffersStoreMock(offers);

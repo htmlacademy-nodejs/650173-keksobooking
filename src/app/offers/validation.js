@@ -3,7 +3,10 @@
 const Utils = require(`../../utils`);
 const {PreparedData} = require(`../../data/data`);
 
-const CLOCK_REGEXP = /^([0-1][0-9]|2[0-3]):([0-5][0-9])$/;
+const Regexps = {
+  CLOCK: /^([0-1][0-9]|2[0-3]):([0-5][0-9])$/,
+  ADDRESS: /^[\d]+,[\s]?[\d]+$/
+};
 
 const errorFormatter = ({msg, param}) => {
   return {
@@ -14,10 +17,14 @@ const errorFormatter = ({msg, param}) => {
 };
 
 const prepareInputData = (req, res, next) => {
-  const name = req.body.name;
+  const {name, features} = req.body;
 
   if (!name || name && name.length === 0) {
-    req.body.name = Utils.randomElementFromArray(PreparedData.NAMES);
+    req.body.name = Utils.getRandomElementFromArray(PreparedData.NAMES);
+  }
+
+  if (features) {
+    req.body.features = [].concat(features);
   }
 
   return next();
@@ -31,9 +38,10 @@ const schema = {
   },
   type: {
     optional: false,
-    exists: true,
-    isIn: {
-      options: PreparedData.TYPES
+    custom: {
+      options: (value) => {
+        return PreparedData.TYPES.includes(value);
+      }
     }
   },
   price: {
@@ -43,23 +51,23 @@ const schema = {
     toInt: true
   },
   address: {
-    isLength: {
-      options: {min: 1, max: 100}
+    matches: {
+      options: Regexps.ADDRESS
     }
   },
   checkin: {
     matches: {
-      options: CLOCK_REGEXP
+      options: Regexps.CLOCK
     }
   },
   checkout: {
     matches: {
-      options: CLOCK_REGEXP
+      options: Regexps.CLOCK
     }
   },
   rooms: {
     isInt: {
-      options: {gt: 0, lt: 100}
+      options: {gt: 0, lt: 1000}
     },
     toInt: true
   },
@@ -69,7 +77,7 @@ const schema = {
       options: (value) => {
         return Array.from(value).every((elem) => PreparedData.FEATURES.indexOf(elem) > -1);
       }
-    },
+    }
   },
   name: {
     optional: true
@@ -88,8 +96,8 @@ const schema = {
   preview: {
     custom: {
       options: (_, {req}) => {
-        if (req.files && req.files.preview && req.files.preview[0]) {
-          return !!req.files.preview[0].mimetype.match(/image/);
+        if (req.files && req.files.preview) {
+          return req.files.preview.every((preview) => !!preview.mimetype.match(/image/));
         }
 
         return true;

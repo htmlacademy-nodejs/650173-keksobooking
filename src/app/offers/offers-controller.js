@@ -6,12 +6,64 @@ const toStream = require(`buffer-to-stream`);
 const Utils = require(`../../utils`);
 const {DefaultsPageSettings} = require(`../../constants`);
 const {errorFormatter} = require(`./validation`);
-const NotFoundError = require(`../errors/not-found-error`);
+const {NotFoundError} = require(`../errors/not-found-error`);
+const BadRequestError = require(`../errors/bad-request-error`);
+const prepareData = require(`./prepare-data`);
+
+const saveImages = async (insertedId, files) => {
+  if (files) {
+    if (files.avatar && files.avatar[0]) {
+      await OffersController.avatarStore.save(
+          insertedId, toStream(files.avatar[0].buffer), files.avatar[0].mimetype
+      );
+    }
+
+    if (files.preview) {
+      await files.preview.forEach((preview, index) => {
+        OffersController.previewStore.save(
+            `${insertedId}-${index}`, toStream(preview.buffer), preview.mimetype
+        );
+      });
+    }
+  }
+};
+
+const findOffer = async (offerDate) => {
+  const offer = await OffersController.store.getOffer(offerDate);
+
+  if (!offer) {
+    throw new BadRequestError(`Оффер с датой "${offerDate}" не найден`);
+  }
+
+  return offer;
+};
+
+const renderImage = (image, offerDate, res) => {
+  res.header(`Content-Type`, image.info.contentType);
+  res.header(`Content-Length`, image.info.length);
+
+  res.on(`error`, (error) => console.error(error));
+  res.on(`end`, () => res.end());
+
+  const stream = image.stream;
+  stream.on(`error`, (error) => console.error(error));
+  stream.on(`end`, () => res.end());
+  return stream.pipe(res);
+};
+
+const isNotNumber = (param) => param && isNaN(parseInt(param, 10));
 
 class OffersController {
   static async index(req, res) {
-    const skip = parseInt(req.query.skip || DefaultsPageSettings.SKIP, 10);
-    const limit = parseInt(req.query.limit || DefaultsPageSettings.LIMIT, 10);
+    let skip;
+    let limit;
+
+    if (isNotNumber(req.query.skip) || isNotNumber(req.query.limit)) {
+      throw new BadRequestError(`Params skip or limit are not correct`);
+    } else {
+      skip = parseInt(req.query.skip || DefaultsPageSettings.SKIP, 10);
+      limit = parseInt(req.query.limit || DefaultsPageSettings.LIMIT, 10);
+    }
 
     const offers = (await Utils.toPage(await OffersController.store.getAllOffers(), skip, limit));
     res.send(offers);
@@ -34,47 +86,39 @@ class OffersController {
     if (!validationCheckResult.isEmpty()) {
       res.status(400).json(validationCheckResult.array());
     } else {
-      const result = await OffersController.store.save(req.body);
+      const preparedData = prepareData(req);
+      const result = await OffersController.store.save(preparedData);
       const insertedId = result.insertedId;
 
-      if (req.files) {
-        if (req.files.avatar && req.files.avatar[0]) {
-          await OffersController.avatarStore.save(insertedId, toStream(req.files.avatar[0].buffer));
-        }
+      saveImages(insertedId, req.files);
 
-        if (req.files.avatar && req.files.preview[0]) {
-          await OffersController.previewStore.save(insertedId, toStream(req.files.preview[0].buffer));
-        }
-      }
-
-      res.send(req.body);
+      res.send(preparedData);
     }
   }
 
   static async avatar(req, res) {
     const offerDate = parseInt(req.params.date, 10);
-    const offer = await OffersController.store.getOffer(offerDate);
-
-    if (!offer) {
-      throw new NotFoundError(`Оффер с датой "${offerDate}" не найден`);
-    }
-
+    const offer = await findOffer(offerDate);
     const avatar = await OffersController.avatarStore.get(offer._id);
 
     if (!avatar) {
       throw new NotFoundError(`Аватар для оффера с датой "${offerDate}" не найден`);
     }
 
-    res.header(`Content-Type`, avatar.info.contentType);
-    res.header(`Content-Length`, avatar.info.length);
+    renderImage(avatar, offerDate, res);
+  }
 
-    res.on(`error`, (error) => console.error(error));
-    res.on(`end`, () => res.end());
+  static async preview(req, res) {
+    const offerDate = parseInt(req.params.date, 10);
+    const previewId = parseInt(req.params.id, 10);
+    const offer = await findOffer(offerDate);
+    const preview = await OffersController.previewStore.get(`${offer._id}-${previewId}`);
 
-    const stream = avatar.stream;
-    stream.on(`error`, (error) => console.error(error));
-    stream.on(`end`, () => res.end());
-    stream.pipe(res);
+    if (!preview) {
+      throw new NotFoundError(`Фото для оффера с датой "${offerDate}" не найдено`);
+    }
+
+    renderImage(preview, offerDate, res);
   }
 }
 

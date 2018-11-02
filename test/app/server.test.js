@@ -11,6 +11,23 @@ const offersRouter = require(`../../src/app/offers/router`)(offersController);
 const Server = require(`../../src/app/server`)(offersRouter);
 const app = new Server().app;
 
+
+describe(`DELETE /api/offers`, () => {
+  it(`returns NOT IMPLEMENTED ERROR(501)`, async () => {
+    const response = await request(app).
+      del(`/api/offers`).
+      expect(501).
+      expect(`Content-Type`, /json/);
+
+    assert.deepStrictEqual(response.body, [
+      {
+        error: `Not Implemented Error`,
+        errorMessage: `DELETE is not implemented`
+      }
+    ]);
+  });
+});
+
 describe(`GET /api/offers`, () => {
   it(`returns all offers`, async () => {
     const response = await request(app).
@@ -47,6 +64,18 @@ describe(`GET /api/offers`, () => {
         limit,
         total: offersStoreMock.offers.length
       });
+    });
+
+    it(`returns 400 when skip or limit are not correct`, async () => {
+      const skip = `str`;
+      const limit = `str2`;
+
+      await request(app).
+        get(`/api/offers?skip=${skip}&limit=${limit}`).
+        set(`Accept`, `application/json`).
+        expect(400).
+        expect(`Params skip or limit are not correct`).
+        expect(`Content-Type`, /html/);
     });
   });
 
@@ -94,21 +123,23 @@ describe(`GET /api/offers/:date`, () => {
 
 describe(`GET /api/offers/:date/avatar`, () => {
   context(`when offer exists`, () => {
-    it(`returns correct offer's avatar`, async () => {
-      const offerDate = offersStoreMock.offers[0].date;
+    const offerWithAvatar = offersStoreMock.offers.find((offer) => offer._id === 1);
+    const offerDate = offerWithAvatar.date;
 
+    it(`returns correct offer's avatar`, async () => {
       return await request(app).
         get(`/api/offers/${offerDate}/avatar`).
-        set(`Accept`, `image/png`).
+        set(`Accept`, `image/jpeg`).
         expect(200).
-        expect(`Content-Type`, /image/);
+        expect(`Content-Type`, `image/jpeg`);
     });
   });
 
   context(`when avatar for offer does not exist`, () => {
-    it(`returns 404`, async () => {
-      const offerDate = offersStoreMock.offers[1].date;
+    const offerWithoutAvatar = offersStoreMock.offers.find((offer) => offer._id === 2);
+    const offerDate = offerWithoutAvatar.date;
 
+    it(`returns 404`, async () => {
       return await request(app).
         get(`/api/offers/${offerDate}/avatar`).
         set(`Accept`, `application/json`).
@@ -125,7 +156,49 @@ describe(`GET /api/offers/:date/avatar`, () => {
       return await request(app).
         get(`/api/offers/${offerDate}/avatar`).
         set(`Accept`, `application/json`).
+        expect(400).
+        expect(`Оффер с датой "${offerDate}" не найден`).
+        expect(`Content-Type`, /html/);
+    });
+  });
+});
+
+describe(`GET /api/offers/:date/preview/:id`, () => {
+  context(`when offer exists`, () => {
+    const offerWithPreview = offersStoreMock.offers.find((offer) => offer._id === 1);
+    const offerDate = offerWithPreview.date;
+
+    it(`returns correct offer's avatar`, async () => {
+      return await request(app).
+        get(`/api/offers/${offerDate}/preview/1`).
+        set(`Accept`, `image/jpeg`).
+        expect(200).
+        expect(`Content-Type`, `image/jpeg`);
+    });
+  });
+
+  context(`when preview for offer does not exist`, () => {
+    const offerWithoutPreview = offersStoreMock.offers.find((offer) => offer._id === 2);
+    const offerDate = offerWithoutPreview.date;
+
+    it(`returns 404`, async () => {
+      return await request(app).
+        get(`/api/offers/${offerDate}/preview/2`).
+        set(`Accept`, `application/json`).
         expect(404).
+        expect(`Фото для оффера с датой "${offerDate}" не найдено`).
+        expect(`Content-Type`, /html/);
+    });
+  });
+
+  context(`when offer does not exist`, () => {
+    it(`returns 404`, async () => {
+      const offerDate = 12345;
+
+      return await request(app).
+        get(`/api/offers/${offerDate}/preview/0`).
+        set(`Accept`, `application/json`).
+        expect(400).
         expect(`Оффер с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
     });
@@ -135,9 +208,9 @@ describe(`GET /api/offers/:date/avatar`, () => {
 describe(`POST /api/offers`, () => {
   const validOfferAttributes = {
     title: `1`.repeat(30),
-    type: `flat`,
+    type: `palace`,
     price: 100,
-    address: `address`,
+    address: `350, 450`,
     checkin: `10:15`,
     checkout: `10:15`,
     rooms: 2,
@@ -195,10 +268,54 @@ describe(`POST /api/offers`, () => {
         expect(200).
         expect(`Content-Type`, /json/);
 
-      const offer = response.body;
-      assert(PreparedData.NAMES.includes(offer.name));
-      delete offer.name;
-      assert.deepStrictEqual(offer, validOfferAttributes);
+      const result = response.body;
+      assert(PreparedData.NAMES.includes(result.author.name));
+      assert.deepStrictEqual(result.offer.photos, []);
+      delete result.offer.photos;
+      assert.deepStrictEqual(result.offer, validOfferAttributes);
+    });
+  });
+
+  context(`when content type is json and features is string`, () => {
+    it(`returns offer`, async () => {
+      validOfferAttributes.features = `wifi`;
+
+      const response = await request(app).
+        post(`/api/offers`).
+        send(validOfferAttributes).
+        set(`Accept`, `application/json`).
+        set(`Content-Type`, `application/json`).
+        expect(200).
+        expect(`Content-Type`, /json/);
+
+      const result = response.body;
+      delete result.offer.photos;
+      validOfferAttributes.features = [`wifi`];
+      assert.deepStrictEqual(result.offer, validOfferAttributes);
+    });
+  });
+
+  context(`when content type is json and features and preview are empty`, () => {
+    it(`returns offer`, async () => {
+      const offerAttributes = Object.assign({}, validOfferAttributes);
+      delete offerAttributes.preview;
+      delete offerAttributes.features;
+
+      const response = await request(app).
+        post(`/api/offers`).
+        send(offerAttributes).
+        set(`Accept`, `application/json`).
+        set(`Content-Type`, `application/json`).
+        expect(200).
+        expect(`Content-Type`, /json/);
+
+      const result = response.body;
+      assert(PreparedData.NAMES.includes(result.author.name));
+      assert.deepStrictEqual(result.offer.photos, []);
+      assert.deepStrictEqual(result.offer.features, []);
+      delete result.offer.photos;
+      delete result.offer.features;
+      assert.deepStrictEqual(result.offer, offerAttributes);
     });
   });
 
@@ -221,10 +338,10 @@ describe(`POST /api/offers`, () => {
         expect(200).
         expect(`Content-Type`, /json/);
 
-      const offer = response.body;
-      assert(PreparedData.NAMES.includes(offer.name));
-      delete offer.name;
-      assert.deepStrictEqual(offer, validOfferAttributes);
+      const result = response.body;
+      delete result.offer.photos;
+      assert(PreparedData.NAMES.includes(result.author.name));
+      assert.deepStrictEqual(result.offer, validOfferAttributes);
     });
   });
 });

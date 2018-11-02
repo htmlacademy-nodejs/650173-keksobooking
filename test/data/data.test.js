@@ -6,7 +6,6 @@ const {Data, PreparedData} = require(`../../src/data/data`);
 let generatedData;
 
 describe(`Data.generate()`, () => {
-
   before(function () {
     generatedData = Data.generate();
   });
@@ -55,6 +54,10 @@ describe(`Data.generate()`, () => {
   });
 
   describe(`author`, () => {
+    it(`should generate correct name`, () => {
+      assert(PreparedData.NAMES.includes(generatedData.author.name));
+    });
+
     it(`should generate correct avatar`, () => {
       assert(generatedData.author.avatar.includes(`https://robohash.org/`));
     });
@@ -71,8 +74,8 @@ describe(`Data.generate()`, () => {
 
   describe(`date`, () => {
     it(`should generate correct date`, () => {
-      const currentDate = Data.date(0);
-      const pastDate = Data.date(PreparedData.DAYS_OFFSET);
+      const currentDate = Data.getDate(0);
+      const pastDate = Data.getDate(PreparedData.DAYS_OFFSET);
 
       assert(generatedData.date <= currentDate && generatedData.date >= pastDate);
     });

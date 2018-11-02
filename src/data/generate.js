@@ -2,7 +2,6 @@
 
 const fs = require(`fs`);
 const {Data} = require(`./data`);
-
 const readline = require(`readline`);
 
 const DefaulsFileParams = {
@@ -24,10 +23,6 @@ class GenerateData {
       input: process.stdin,
       output: process.stdout
     });
-  }
-
-  static createFilePath(fileName) {
-    return `${process.cwd()}/tmp/${fileName}.json`;
   }
 
   start() {
@@ -110,6 +105,10 @@ class GenerateData {
         return success();
       });
     });
+  }
+
+  static createFilePath(fileName) {
+    return `${process.cwd()}/tmp/${fileName}.json`;
   }
 }
 
