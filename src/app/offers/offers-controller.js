@@ -7,17 +7,22 @@ const Utils = require(`../../utils`);
 const {DefaultsPageSettings} = require(`../../constants`);
 const {errorFormatter} = require(`./validation`);
 const {NotFoundError} = require(`../errors/not-found-error`);
+const BadRequestError = require(`../errors/bad-request-error`);
 const prepareData = require(`./prepare-data`);
 
 const saveImages = async (insertedId, files) => {
   if (files) {
     if (files.avatar && files.avatar[0]) {
-      await OffersController.avatarStore.save(insertedId, toStream(files.avatar[0].buffer));
+      await OffersController.avatarStore.save(
+          insertedId, toStream(files.avatar[0].buffer), files.avatar[0].mimetype
+      );
     }
 
     if (files.preview) {
       await files.preview.forEach((preview, index) => {
-        OffersController.previewStore.save(`${insertedId}-${index}`, toStream(preview.buffer));
+        OffersController.previewStore.save(
+            `${insertedId}-${index}`, toStream(preview.buffer), preview.mimetype
+        );
       });
     }
   }
@@ -27,7 +32,7 @@ const findOffer = async (offerDate) => {
   const offer = await OffersController.store.getOffer(offerDate);
 
   if (!offer) {
-    throw new NotFoundError(`Оффер с датой "${offerDate}" не найден`);
+    throw new BadRequestError(`Оффер с датой "${offerDate}" не найден`);
   }
 
   return offer;
@@ -46,11 +51,19 @@ const renderImage = (image, offerDate, res) => {
   return stream.pipe(res);
 };
 
+const isNotNumber = (param) => param && isNaN(parseInt(param, 10));
 
 class OffersController {
   static async index(req, res) {
-    const skip = parseInt(req.query.skip || DefaultsPageSettings.SKIP, 10);
-    const limit = parseInt(req.query.limit || DefaultsPageSettings.LIMIT, 10);
+    let skip;
+    let limit;
+
+    if (isNotNumber(req.query.skip) || isNotNumber(req.query.limit)) {
+      throw new BadRequestError(`Params skip or limit are not correct`);
+    } else {
+      skip = parseInt(req.query.skip || DefaultsPageSettings.SKIP, 10);
+      limit = parseInt(req.query.limit || DefaultsPageSettings.LIMIT, 10);
+    }
 
     const offers = (await Utils.toPage(await OffersController.store.getAllOffers(), skip, limit));
     res.send(offers);

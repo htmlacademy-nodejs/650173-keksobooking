@@ -11,6 +11,23 @@ const offersRouter = require(`../../src/app/offers/router`)(offersController);
 const Server = require(`../../src/app/server`)(offersRouter);
 const app = new Server().app;
 
+
+describe(`DELETE /api/offers`, () => {
+  it(`returns NOT IMPLEMENTED ERROR(501)`, async () => {
+    const response = await request(app).
+      del(`/api/offers`).
+      expect(501).
+      expect(`Content-Type`, /json/);
+
+    assert.deepStrictEqual(response.body, [
+      {
+        error: `Not Implemented Error`,
+        errorMessage: `DELETE is not implemented`
+      }
+    ]);
+  });
+});
+
 describe(`GET /api/offers`, () => {
   it(`returns all offers`, async () => {
     const response = await request(app).
@@ -47,6 +64,18 @@ describe(`GET /api/offers`, () => {
         limit,
         total: offersStoreMock.offers.length
       });
+    });
+
+    it(`returns 400 when skip or limit are not correct`, async () => {
+      const skip = `str`;
+      const limit = `str2`;
+
+      await request(app).
+        get(`/api/offers?skip=${skip}&limit=${limit}`).
+        set(`Accept`, `application/json`).
+        expect(400).
+        expect(`Params skip or limit are not correct`).
+        expect(`Content-Type`, /html/);
     });
   });
 
@@ -127,7 +156,7 @@ describe(`GET /api/offers/:date/avatar`, () => {
       return await request(app).
         get(`/api/offers/${offerDate}/avatar`).
         set(`Accept`, `application/json`).
-        expect(404).
+        expect(400).
         expect(`Оффер с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
     });
@@ -169,7 +198,7 @@ describe(`GET /api/offers/:date/preview/:id`, () => {
       return await request(app).
         get(`/api/offers/${offerDate}/preview/0`).
         set(`Accept`, `application/json`).
-        expect(404).
+        expect(400).
         expect(`Оффер с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
     });
@@ -243,6 +272,25 @@ describe(`POST /api/offers`, () => {
       assert(PreparedData.NAMES.includes(result.author.name));
       assert.deepStrictEqual(result.offer.photos, []);
       delete result.offer.photos;
+      assert.deepStrictEqual(result.offer, validOfferAttributes);
+    });
+  });
+
+  context(`when content type is json and features is string`, () => {
+    it(`returns offer`, async () => {
+      validOfferAttributes.features = `wifi`;
+
+      const response = await request(app).
+        post(`/api/offers`).
+        send(validOfferAttributes).
+        set(`Accept`, `application/json`).
+        set(`Content-Type`, `application/json`).
+        expect(200).
+        expect(`Content-Type`, /json/);
+
+      const result = response.body;
+      delete result.offer.photos;
+      validOfferAttributes.features = [`wifi`];
       assert.deepStrictEqual(result.offer, validOfferAttributes);
     });
   });

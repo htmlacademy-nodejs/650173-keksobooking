@@ -74,8 +74,8 @@ describe(`Data.generate()`, () => {
 
   describe(`date`, () => {
     it(`should generate correct date`, () => {
-      const currentDate = Data.date(0);
-      const pastDate = Data.date(PreparedData.DAYS_OFFSET);
+      const currentDate = Data.getDate(0);
+      const pastDate = Data.getDate(PreparedData.DAYS_OFFSET);
 
       assert(generatedData.date <= currentDate && generatedData.date >= pastDate);
     });

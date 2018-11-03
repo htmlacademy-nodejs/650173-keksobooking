@@ -1,11 +1,10 @@
 'use strict';
 
-require(`dotenv`).config();
-
 const express = require(`express`);
 const logger = require(`../logger`);
 const {NOT_FOUND_HANDLER} = require(`./errors/not-found-error`);
 const ERROR_HANDLER = require(`./errors/errors-handler`);
+const NOT_IMPLEMENTED_HANDLER = require(`./errors/not-implemented-handler`);
 const ALLOW_CORS = require(`./allow-cors.js`);
 
 const {
@@ -21,23 +20,24 @@ class Server {
     this._setup();
   }
 
+  get serverAddress() {
+    return `http://${ SERVER_HOST }:${ this.port }/`;
+  }
+
   start() {
     return new Promise(() => {
-      this.app.listen(this.port, SERVER_HOST, () => logger.info(`Server running at ${ this._serverAddress }`));
+      this.app.listen(this.port, SERVER_HOST, () => logger.info(`Server running at ${ this.serverAddress }`));
     });
   }
 
   _setup() {
+    this.app.use(NOT_IMPLEMENTED_HANDLER);
     this.app.use(express.static(`${__dirname}/../../static`));
     this.app.use(express.json());
     this.app.use(`/api/offers`, Server.router);
     this.app.use(ALLOW_CORS);
     this.app.use(NOT_FOUND_HANDLER);
     this.app.use(ERROR_HANDLER);
-  }
-
-  get _serverAddress() {
-    return `http://${ SERVER_HOST }:${ this.port }/`;
   }
 }
 

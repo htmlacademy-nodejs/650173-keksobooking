@@ -24,7 +24,7 @@ class OffersStoreMock {
 }
 
 module.exports = (() => {
-  let offers = [];
+  const offers = [];
 
   for (let i = 0; i < 2; i++) {
     const generatedOffer = Data.generate();

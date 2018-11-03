@@ -20,14 +20,6 @@ class Command {
     ];
   }
 
-  static exitWithoutError() {
-    process.exit(ExitStatuses.OK);
-  }
-
-  static exitWithError() {
-    process.exit(ExitStatuses.ERROR);
-  }
-
   handle() {
     this._checkHelpCommand();
     this._checkCommands()
@@ -61,6 +53,14 @@ class Command {
     errorCommand
       .execute(this.userCommand)
       .then(Command.exitWithError);
+  }
+
+  static exitWithoutError() {
+    process.exit(ExitStatuses.OK);
+  }
+
+  static exitWithError() {
+    process.exit(ExitStatuses.ERROR);
   }
 }
 
