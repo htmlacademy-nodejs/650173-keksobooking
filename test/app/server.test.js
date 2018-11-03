@@ -88,12 +88,19 @@ describe(`GET /api/offers`, () => {
       const skip = `str`;
       const limit = `str2`;
 
-      await request(app).
+      const response = await request(app).
         get(`/api/offers?skip=${skip}&limit=${limit}`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(400).
-        expect(`Params skip or limit are not correct`).
         expect(`Content-Type`, /html/);
+
+      const error = JSON.parse(response.text);
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Params skip or limit are not correct`
+        }
+      ]);
     });
   });
 
@@ -101,7 +108,7 @@ describe(`GET /api/offers`, () => {
     it(`returns 404`, async () => {
       return await request(app).
         get(`/api/unknown_resource`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(404).
         expect(`Page was not found`).
         expect(`Content-Type`, /html/);
@@ -146,12 +153,39 @@ describe(`GET /api/offers/:date`, () => {
     it(`returns 404`, async () => {
       const offerDate = 12345;
 
-      return request(app).
+      const response = await request(app).
         get(`/api/offers/${offerDate}`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(404).
-        expect(`Оффер с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
+
+      const error = JSON.parse(response.text);
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Оффер с датой "${offerDate}" не найден`
+        }
+      ]);
+    });
+  });
+
+  context(`when offer does not exist and accept is application/json`, () => {
+    it(`returns 404`, async () => {
+      const offerDate = 12345;
+
+      const response = await request(app).
+      get(`/api/offers/${offerDate}`).
+      set(`Accept`, `application/json`).
+      expect(404).
+      expect(`Content-Type`, /json/);
+
+      const error = response.body;
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Оффер с датой "${offerDate}" не найден`
+        }
+      ]);
     });
   });
 });
@@ -175,12 +209,19 @@ describe(`GET /api/offers/:date/avatar`, () => {
     const offerDate = offerWithoutAvatar.date;
 
     it(`returns 404`, async () => {
-      return await request(app).
+      const response = await request(app).
         get(`/api/offers/${offerDate}/avatar`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(404).
-        expect(`Аватар для оффера с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
+
+      const error = JSON.parse(response.text);
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Аватар для оффера с датой "${offerDate}" не найден`
+        }
+      ]);
     });
   });
 
@@ -188,12 +229,19 @@ describe(`GET /api/offers/:date/avatar`, () => {
     it(`returns 404`, async () => {
       const offerDate = 12345;
 
-      return await request(app).
+      const response = await request(app).
         get(`/api/offers/${offerDate}/avatar`).
         set(`Accept`, `application/json`).
         expect(400).
-        expect(`Оффер с датой "${offerDate}" не найден`).
-        expect(`Content-Type`, /html/);
+        expect(`Content-Type`, /json/);
+
+      const error = response.body;
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Оффер с датой "${offerDate}" не найден`
+        }
+      ]);
     });
   });
 });
@@ -217,12 +265,19 @@ describe(`GET /api/offers/:date/preview/:id`, () => {
     const offerDate = offerWithoutPreview.date;
 
     it(`returns 404`, async () => {
-      return await request(app).
+      const response = await request(app).
         get(`/api/offers/${offerDate}/preview/2`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(404).
-        expect(`Фото для оффера с датой "${offerDate}" не найдено`).
         expect(`Content-Type`, /html/);
+
+      const error = JSON.parse(response.text);
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Фото для оффера с датой "${offerDate}" не найдено`
+        }
+      ]);
     });
   });
 
@@ -230,12 +285,19 @@ describe(`GET /api/offers/:date/preview/:id`, () => {
     it(`returns 404`, async () => {
       const offerDate = 12345;
 
-      return await request(app).
+      const response = await request(app).
         get(`/api/offers/${offerDate}/preview/0`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(400).
-        expect(`Оффер с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
+
+      const error = JSON.parse(response.text);
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Оффер с датой "${offerDate}" не найден`
+        }
+      ]);
     });
   });
 });
