@@ -9,6 +9,7 @@ const {errorFormatter} = require(`./validation`);
 const {NotFoundError} = require(`../errors/not-found-error`);
 const BadRequestError = require(`../errors/bad-request-error`);
 const prepareData = require(`./prepare-data`);
+const showDataByAcceptType = require(`./show-data-by-accept-type`);
 
 const saveImages = async (insertedId, files) => {
   if (files) {
@@ -25,19 +26,6 @@ const saveImages = async (insertedId, files) => {
         );
       });
     }
-  }
-};
-
-const showDataByAcceptType = (req, res, data) => {
-  switch (req.accepts([`json`, `html`])) {
-    case `json`:
-      res.setHeader(`Content-Type`, `application/json`);
-      res.send(data);
-      break;
-    case `html`:
-      res.setHeader(`Content-Type`, `text/html`);
-      res.send(JSON.stringify(data));
-      break;
   }
 };
 
@@ -61,6 +49,7 @@ const renderImage = (image, offerDate, res) => {
   const stream = image.stream;
   stream.on(`error`, (error) => console.error(error));
   stream.on(`end`, () => res.end());
+
   return stream.pipe(res);
 };
 
@@ -97,7 +86,8 @@ class OffersController {
     const validationCheckResult = validationResult(req).formatWith(errorFormatter);
 
     if (!validationCheckResult.isEmpty()) {
-      res.status(400).json(validationCheckResult.array());
+      res.status(400);
+      showDataByAcceptType(req, res, validationCheckResult.array());
     } else {
       const preparedData = prepareData(req);
       const result = await OffersController.store.save(preparedData);

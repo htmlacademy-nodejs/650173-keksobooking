@@ -271,6 +271,21 @@ describe(`POST /api/offers`, () => {
       const offer = response.body;
       assert.deepStrictEqual(offer, validationErrors);
     });
+
+    context(`when accept is text/thml`, () => {
+      it(`returns array of errors`, async () => {
+        const response = await request(app).
+          post(`/api/offers`).
+          send({features: [`test`]}).
+          set(`Accept`, `text/html`).
+          set(`Content-Type`, `application/json`).
+          expect(400).
+          expect(`Content-Type`, /html/);
+
+        const offer = response.text;
+        assert.deepStrictEqual(offer, JSON.stringify(validationErrors));
+      });
+    });
   });
 
   context(`when data is invalid and content type is multipart/form-data`, () => {
@@ -290,6 +305,24 @@ describe(`POST /api/offers`, () => {
 
       const offer = response.body;
       assert.deepStrictEqual(offer, validationErrorsWithFiles);
+    });
+
+
+    context(`when accept is text/thml`, () => {
+      it(`returns array of errors`, async () => {
+        const response = await request(app).
+          post(`/api/offers`).
+          field(`features`, [`test`]).
+          attach(`avatar`, `test/fixtures/file.txt`).
+          attach(`preview`, `test/fixtures/file.txt`).
+          set(`Accept`, `text/html`).
+          set(`Content-Type`, `multipart/form-data`).
+          expect(400).
+          expect(`Content-Type`, /html/);
+
+        const offer = response.text;
+        assert.deepStrictEqual(offer, JSON.stringify(validationErrorsWithFiles));
+      });
     });
   });
 
