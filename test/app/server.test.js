@@ -45,6 +45,24 @@ describe(`GET /api/offers`, () => {
     });
   });
 
+  context(`when accept is text/html`, () => {
+    it(`returns all offers`, async () => {
+      const response = await request(app).
+        get(`/api/offers`).
+        set(`Accept`, `text/html`).
+        expect(200).
+        expect(`Content-Type`, /html/);
+
+      const requestedOffers = response.text;
+      assert.deepStrictEqual(requestedOffers, JSON.stringify({
+        data: offersStoreMock.offers,
+        skip: 0,
+        limit: 20,
+        total: offersStoreMock.offers.length
+      }));
+    });
+  });
+
   context(`when limit and skip are present`, () => {
     it(`returns part of offers`, async () => {
       const skip = 2;
@@ -94,7 +112,8 @@ describe(`GET /api/offers`, () => {
 describe(`GET /api/offers/:date`, () => {
   context(`when offer exists`, () => {
     it(`returns correct offer`, async () => {
-      const offerDate = offersStoreMock.offers[0].date;
+      const offer = offersStoreMock.offers[0];
+      const offerDate = offer.date;
 
       const response = await request(app).
         get(`/api/offers/${offerDate}`).
@@ -103,7 +122,23 @@ describe(`GET /api/offers/:date`, () => {
         expect(`Content-Type`, /json/);
 
       const requestedOffer = response.body;
-      assert.strictEqual(requestedOffer.date, offerDate);
+      assert.deepStrictEqual(requestedOffer, offer);
+    });
+  });
+
+  context(`when offer exists and accept is text/html`, () => {
+    it(`returns correct offer`, async () => {
+      const offer = offersStoreMock.offers[0];
+      const offerDate = offer.date;
+
+      const response = await request(app).
+        get(`/api/offers/${offerDate}`).
+        set(`Accept`, `text/html`).
+        expect(200).
+        expect(`Content-Type`, /html/);
+
+      const requestedOffer = response.text;
+      assert.deepStrictEqual(requestedOffer, JSON.stringify(offer));
     });
   });
 

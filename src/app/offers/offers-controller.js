@@ -28,6 +28,19 @@ const saveImages = async (insertedId, files) => {
   }
 };
 
+const showDataByAcceptType = (req, res, data) => {
+  switch (req.accepts([`json`, `html`])) {
+    case `json`:
+      res.setHeader(`Content-Type`, `application/json`);
+      res.send(data);
+      break;
+    case `html`:
+      res.setHeader(`Content-Type`, `text/html`);
+      res.send(JSON.stringify(data));
+      break;
+  }
+};
+
 const findOffer = async (offerDate) => {
   const offer = await OffersController.store.getOffer(offerDate);
 
@@ -66,7 +79,7 @@ class OffersController {
     }
 
     const offers = (await Utils.toPage(await OffersController.store.getAllOffers(), skip, limit));
-    res.send(offers);
+    showDataByAcceptType(req, res, offers);
   }
 
   static async show(req, res) {
@@ -77,7 +90,7 @@ class OffersController {
       throw new NotFoundError(`Оффер с датой "${offerDate}" не найден`);
     }
 
-    res.send(offer);
+    showDataByAcceptType(req, res, offer);
   }
 
   static async create(req, res) {
