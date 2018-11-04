@@ -14,10 +14,10 @@ class DefaultCommand {
 
   execute() {
     console.log(`Hey there!\nThis app will execute the server for «${ packageInfo.name }».\nAuthor: ${ packageInfo.author }\n`);
-    console.log(`Write --help to get available commands`);
+    console.log(`Write "help" to get available commands`);
 
     return this.readline.question(`Enter the command: `, (userCommand) => {
-      new this.Command(userCommand).handle();
+      new this.Command(userCommand, true).handle();
     });
   }
 }
