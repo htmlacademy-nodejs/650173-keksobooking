@@ -45,6 +45,24 @@ describe(`GET /api/offers`, () => {
     });
   });
 
+  context(`when accept is text/html`, () => {
+    it(`returns all offers`, async () => {
+      const response = await request(app).
+        get(`/api/offers`).
+        set(`Accept`, `text/html`).
+        expect(200).
+        expect(`Content-Type`, /html/);
+
+      const requestedOffers = response.text;
+      assert.deepStrictEqual(requestedOffers, JSON.stringify({
+        data: offersStoreMock.offers,
+        skip: 0,
+        limit: 20,
+        total: offersStoreMock.offers.length
+      }));
+    });
+  });
+
   context(`when limit and skip are present`, () => {
     it(`returns part of offers`, async () => {
       const skip = 2;
@@ -70,12 +88,19 @@ describe(`GET /api/offers`, () => {
       const skip = `str`;
       const limit = `str2`;
 
-      await request(app).
+      const response = await request(app).
         get(`/api/offers?skip=${skip}&limit=${limit}`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(400).
-        expect(`Params skip or limit are not correct`).
         expect(`Content-Type`, /html/);
+
+      const error = JSON.parse(response.text);
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Params skip or limit are not correct`
+        }
+      ]);
     });
   });
 
@@ -83,7 +108,7 @@ describe(`GET /api/offers`, () => {
     it(`returns 404`, async () => {
       return await request(app).
         get(`/api/unknown_resource`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(404).
         expect(`Page was not found`).
         expect(`Content-Type`, /html/);
@@ -94,7 +119,8 @@ describe(`GET /api/offers`, () => {
 describe(`GET /api/offers/:date`, () => {
   context(`when offer exists`, () => {
     it(`returns correct offer`, async () => {
-      const offerDate = offersStoreMock.offers[0].date;
+      const offer = offersStoreMock.offers[0];
+      const offerDate = offer.date;
 
       const response = await request(app).
         get(`/api/offers/${offerDate}`).
@@ -103,7 +129,23 @@ describe(`GET /api/offers/:date`, () => {
         expect(`Content-Type`, /json/);
 
       const requestedOffer = response.body;
-      assert.strictEqual(requestedOffer.date, offerDate);
+      assert.deepStrictEqual(requestedOffer, offer);
+    });
+  });
+
+  context(`when offer exists and accept is text/html`, () => {
+    it(`returns correct offer`, async () => {
+      const offer = offersStoreMock.offers[0];
+      const offerDate = offer.date;
+
+      const response = await request(app).
+        get(`/api/offers/${offerDate}`).
+        set(`Accept`, `text/html`).
+        expect(200).
+        expect(`Content-Type`, /html/);
+
+      const requestedOffer = response.text;
+      assert.deepStrictEqual(requestedOffer, JSON.stringify(offer));
     });
   });
 
@@ -111,12 +153,39 @@ describe(`GET /api/offers/:date`, () => {
     it(`returns 404`, async () => {
       const offerDate = 12345;
 
-      return request(app).
+      const response = await request(app).
         get(`/api/offers/${offerDate}`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(404).
-        expect(`Оффер с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
+
+      const error = JSON.parse(response.text);
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Оффер с датой "${offerDate}" не найден`
+        }
+      ]);
+    });
+  });
+
+  context(`when offer does not exist and accept is application/json`, () => {
+    it(`returns 404`, async () => {
+      const offerDate = 12345;
+
+      const response = await request(app).
+      get(`/api/offers/${offerDate}`).
+      set(`Accept`, `application/json`).
+      expect(404).
+      expect(`Content-Type`, /json/);
+
+      const error = response.body;
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Оффер с датой "${offerDate}" не найден`
+        }
+      ]);
     });
   });
 });
@@ -140,12 +209,19 @@ describe(`GET /api/offers/:date/avatar`, () => {
     const offerDate = offerWithoutAvatar.date;
 
     it(`returns 404`, async () => {
-      return await request(app).
+      const response = await request(app).
         get(`/api/offers/${offerDate}/avatar`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(404).
-        expect(`Аватар для оффера с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
+
+      const error = JSON.parse(response.text);
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Аватар для оффера с датой "${offerDate}" не найден`
+        }
+      ]);
     });
   });
 
@@ -153,12 +229,19 @@ describe(`GET /api/offers/:date/avatar`, () => {
     it(`returns 404`, async () => {
       const offerDate = 12345;
 
-      return await request(app).
+      const response = await request(app).
         get(`/api/offers/${offerDate}/avatar`).
         set(`Accept`, `application/json`).
         expect(400).
-        expect(`Оффер с датой "${offerDate}" не найден`).
-        expect(`Content-Type`, /html/);
+        expect(`Content-Type`, /json/);
+
+      const error = response.body;
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Оффер с датой "${offerDate}" не найден`
+        }
+      ]);
     });
   });
 });
@@ -182,12 +265,19 @@ describe(`GET /api/offers/:date/preview/:id`, () => {
     const offerDate = offerWithoutPreview.date;
 
     it(`returns 404`, async () => {
-      return await request(app).
+      const response = await request(app).
         get(`/api/offers/${offerDate}/preview/2`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(404).
-        expect(`Фото для оффера с датой "${offerDate}" не найдено`).
         expect(`Content-Type`, /html/);
+
+      const error = JSON.parse(response.text);
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Фото для оффера с датой "${offerDate}" не найдено`
+        }
+      ]);
     });
   });
 
@@ -195,12 +285,19 @@ describe(`GET /api/offers/:date/preview/:id`, () => {
     it(`returns 404`, async () => {
       const offerDate = 12345;
 
-      return await request(app).
+      const response = await request(app).
         get(`/api/offers/${offerDate}/preview/0`).
-        set(`Accept`, `application/json`).
+        set(`Accept`, `text/html`).
         expect(400).
-        expect(`Оффер с датой "${offerDate}" не найден`).
         expect(`Content-Type`, /html/);
+
+      const error = JSON.parse(response.text);
+      assert.deepStrictEqual(error, [
+        {
+          error: `Error`,
+          errorMessage: `Оффер с датой "${offerDate}" не найден`
+        }
+      ]);
     });
   });
 });
@@ -236,6 +333,21 @@ describe(`POST /api/offers`, () => {
       const offer = response.body;
       assert.deepStrictEqual(offer, validationErrors);
     });
+
+    context(`when accept is text/thml`, () => {
+      it(`returns array of errors`, async () => {
+        const response = await request(app).
+          post(`/api/offers`).
+          send({features: [`test`]}).
+          set(`Accept`, `text/html`).
+          set(`Content-Type`, `application/json`).
+          expect(400).
+          expect(`Content-Type`, /html/);
+
+        const offer = response.text;
+        assert.deepStrictEqual(offer, JSON.stringify(validationErrors));
+      });
+    });
   });
 
   context(`when data is invalid and content type is multipart/form-data`, () => {
@@ -255,6 +367,24 @@ describe(`POST /api/offers`, () => {
 
       const offer = response.body;
       assert.deepStrictEqual(offer, validationErrorsWithFiles);
+    });
+
+
+    context(`when accept is text/thml`, () => {
+      it(`returns array of errors`, async () => {
+        const response = await request(app).
+          post(`/api/offers`).
+          field(`features`, [`test`]).
+          attach(`avatar`, `test/fixtures/file.txt`).
+          attach(`preview`, `test/fixtures/file.txt`).
+          set(`Accept`, `text/html`).
+          set(`Content-Type`, `multipart/form-data`).
+          expect(400).
+          expect(`Content-Type`, /html/);
+
+        const offer = response.text;
+        assert.deepStrictEqual(offer, JSON.stringify(validationErrorsWithFiles));
+      });
     });
   });
 

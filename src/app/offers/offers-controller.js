@@ -9,6 +9,7 @@ const {errorFormatter} = require(`./validation`);
 const {NotFoundError} = require(`../errors/not-found-error`);
 const BadRequestError = require(`../errors/bad-request-error`);
 const prepareData = require(`./prepare-data`);
+const showDataByAcceptType = require(`./show-data-by-accept-type`);
 
 const saveImages = async (insertedId, files) => {
   if (files) {
@@ -48,6 +49,7 @@ const renderImage = (image, offerDate, res) => {
   const stream = image.stream;
   stream.on(`error`, (error) => console.error(error));
   stream.on(`end`, () => res.end());
+
   return stream.pipe(res);
 };
 
@@ -66,7 +68,7 @@ class OffersController {
     }
 
     const offers = (await Utils.toPage(await OffersController.store.getAllOffers(), skip, limit));
-    res.send(offers);
+    showDataByAcceptType(req, res, offers);
   }
 
   static async show(req, res) {
@@ -77,14 +79,15 @@ class OffersController {
       throw new NotFoundError(`Оффер с датой "${offerDate}" не найден`);
     }
 
-    res.send(offer);
+    showDataByAcceptType(req, res, offer);
   }
 
   static async create(req, res) {
     const validationCheckResult = validationResult(req).formatWith(errorFormatter);
 
     if (!validationCheckResult.isEmpty()) {
-      res.status(400).json(validationCheckResult.array());
+      res.status(400);
+      showDataByAcceptType(req, res, validationCheckResult.array());
     } else {
       const preparedData = prepareData(req);
       const result = await OffersController.store.save(preparedData);

@@ -1,14 +1,25 @@
 'use strict';
 
+const readline = require(`readline`);
 const packageInfo = require(`../../package.json`);
-const GenerateData = require(`../data/generate`);
 
-module.exports = {
-  name: undefined,
-  userCommand: false,
+class DefaultCommand {
+  constructor(Command) {
+    this.Command = Command;
+    this.readline = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+  }
+
   execute() {
     console.log(`Hey there!\nThis app will execute the server for «${ packageInfo.name }».\nAuthor: ${ packageInfo.author }\n`);
+    console.log(`Write "help" to get available commands`);
 
-    return new GenerateData().start();
+    return this.readline.question(`Enter the command: `, (userCommand) => {
+      new this.Command(userCommand, true).handle();
+    });
   }
-};
+}
+
+module.exports = DefaultCommand;

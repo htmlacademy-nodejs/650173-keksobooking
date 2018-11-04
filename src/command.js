@@ -4,17 +4,16 @@ const {ExitStatuses} = require(`./constants`);
 const versionCommand = require(`./commands/version`);
 const authorCommand = require(`./commands/author`);
 const helpCommand = require(`./commands/help`);
-const defaultCommand = require(`./commands/default`);
 const errorCommand = require(`./commands/error`);
 const serverCommand = require(`./commands/server`);
 const fillCommand = require(`./commands/fill`);
 
 class Command {
-  constructor(userCommand) {
-    this.userCommand = userCommand;
+  constructor(userCommand, interactiveInput = false) {
+    this.interactiveInput = interactiveInput;
+    this.userCommand = this._prepareCommand(userCommand);
     this.commands = [
       helpCommand,
-      defaultCommand,
       versionCommand,
       authorCommand,
       serverCommand,
@@ -27,6 +26,14 @@ class Command {
     this._checkCommands()
       .then(Command.exitWithoutError)
       .catch(() => this._showErrorAndExit());
+  }
+
+  _prepareCommand(userCommand) {
+    if (this.interactiveInput) {
+      return `--` + userCommand.replace(/^--/, ``);
+    } else {
+      return userCommand;
+    }
   }
 
   _checkCommands() {
@@ -46,7 +53,7 @@ class Command {
   _checkHelpCommand() {
     if (this.userCommand === helpCommand.name) {
       helpCommand
-        .execute(this.commands.filter((command) => command.userCommand))
+        .execute(this.commands.filter((command) => command.userCommand), this.interactiveInput)
         .then(Command.exitWithoutError);
     }
   }
